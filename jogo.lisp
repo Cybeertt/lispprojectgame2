@@ -28,55 +28,44 @@
   (format t "~S ~%" (reserva (tab))))
 
 (defun tabuleiro (problema)
-  (car problema)
-  )
+  (car problema))
 
 
 (defun reserva (problema)
-  (cadr problema)
-)
+  (cadr problema))
 
 
 (defun fila (l tabuleiro)
-  (nth l tabuleiro)
-)
+  (nth l tabuleiro))
 
 
 (defun coluna (c tabuleiro)
 ; e - Elemento do tabuleiro
-  (mapcar #'(lambda (e) (nth c e)) tabuleiro)
-)
+  (mapcar #'(lambda (e) (nth c e)) tabuleiro))
 
 (defun celula (l c tabuleiro)
-  (nth l (nth c tabuleiro))
-)
+  (nth l (nth c tabuleiro)))
 
 
 (defun cria-lista-indice (i)
   (cond 
    ((< i 1) nil)
-   (t (cons (1- i) (cria-lista-indice (1- i))))
-   )
-)
+   (t (cons (1- i) (cria-lista-indice (1- i))))))
 
 
 (defun diagonal-esquerda (tabuleiro)
 ; e - Elemento da lista
-  (mapcar #'(lambda (e) (celula e e tabuleiro)) (reverse (cria-lista-indice (length tabuleiro))))
-)
+  (mapcar #'(lambda (e) (celula e e tabuleiro)) (reverse (cria-lista-indice (length tabuleiro)))))
 
 (defun diagonal-direita (tabuleiro)
 ; i - indice
   (let ((i (1- (length tabuleiro))))
 ; e - Elemento da lista
-    (mapcar #'(lambda (e) (celula e (- i e) tabuleiro)) (reverse (cria-lista-indice (length tabuleiro))))
-)
-)
+    (mapcar #'(lambda (e) (celula e (- i e) tabuleiro)) (reverse (cria-lista-indice (length tabuleiro))))))
 
 
 (defun casa-vaziap (l c tabuleiro)
-  (numberp (celula l c tabuleiro))
-)
+  (numberp (celula l c tabuleiro)))
 
 (defun casas-vazias (tab &optional (l 0))
   (cond 
@@ -98,18 +87,13 @@
     (cond
      ((or (null reserva) (null p)) NIL)
      ((funcall predp p (car reserva)) (remove-peca p (cdr reserva)))
-     (t (cons (car reserva) (remove-peca p (cdr reserva))))
-     )
-    )
-  )
+     (t (cons (car reserva) (remove-peca p (cdr reserva)))))))
 
 
 (defun substituir-posicao (i p fila-tabuleiro)
   (cond
    ((or (null p) (null fila-tabuleiro)) NIL)
-   (t (setf (nth i fila-tabuleiro) p))
-   )
-  )
+   (t (setf (nth i fila-tabuleiro) p))))
 
 (defun colunas (tabuleiro)
   (list (coluna 0 tabuleiro)  (coluna 1 tabuleiro) (coluna 2 tabuleiro) (coluna 3 tabuleiro)))
@@ -162,13 +146,4 @@
 
 
 
-(defun jogada (l c p)
-  (cond
-   ;((null (reserva problema)) nil)
-   ((not (casa-vaziap l c (tabuleiro (tab)))) nil)
-   (t 
-    (let ((novo-tabuleiro (copy-tree (tabuleiro (tab)))))
-      (substituir-posicao c p (fila l novo-tabuleiro))
-      (list novo-tabuleiro (remove-peca p (reserva (tab))))
-      )
-    )))
+

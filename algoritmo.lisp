@@ -14,7 +14,7 @@
 (defun comcom (tempo)
     (reiniciar)
 
-    (display-start-board *tabuleiro)
+    (exibir-tab *tabuleiro)
     
     (loop while (or (not (null (generate-moves *tabuleiro *jogador))) (not (null (generate-moves *tabuleiro (opposite *jogador)))) (equal 100 (length (remove-nil-value *tabuleiro))))
       do
@@ -22,7 +22,6 @@
       (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
       (setf *jogador (opposite *jogador))
     )
-
     
   )
 
@@ -35,22 +34,19 @@
     (cond
         ((equal *jogador -1)
             (let* (
-              (jog-dis (casas-vazias *tab))
-            )
+              (jog-dis (casas-vazias (tabuleiro(*tabuleiro)))))
 
             (cond
-            ((null jog-dis) (setf *tab (human-play (read-play (casas-vazias *tab)))))
-            (t (setf *tab (human-play (read-play jog-dis))))
-            )
-          )
+            ((null jog-dis) (setf *tab (human-play (read-play (casas-vazias (tabuleiro(*tabuleiro)))))))
+            (t (setf *tabuleiro (human-play (read-play jog-dis))))))
 
           (terpri)
-          (exibir-tab *tab)
+          (exibir-tab *tabuleiro)
         )
-        (t (setf *board (jogar *tab tempo)))
+        (t (setf *board (jogar *tabuleiro tempo)))
       )
 
-    (setf *jogador (outro-jogador *player))
+    (setf *jogador (outro-jogador *jogador))
 )
 
 (defun substituir-posicao (i p fila-tabuleiro)
@@ -97,8 +93,8 @@
     )
    )
   )
-)|#
-
+)
+|#
 
 (defun outro-jogador (j)
   (cond
