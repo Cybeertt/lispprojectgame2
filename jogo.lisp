@@ -102,47 +102,7 @@
   (list (diagonal-direita tabuleiro) (diagonal-esquerda tabuleiro)))
 
 
-(defun quatro-linha-p (tabuleiro)
-  (cond
-   ((null tabuleiro) nil)
-   (t
-    (let* ((linhas (append tabuleiro (colunas tabuleiro) (diagonais tabuleiro)))
-           (linhas-cheias (remove-if-not #'(lambda (z) 
-                                             (= 4 (list-length z)))
-                                         (mapcar #'(lambda (x) 
-                                                     (remove-if #'(lambda (y) (eq y 0)) x))
-                                                 linhas))))
-      (cond
-       ((null linhas-cheias) nil)
-       (t (reduce #'(lambda (&optional x y) (or x y)) (mapcar #'sao-iguaisp linhas-cheias))))))))
 
-
-(defun max-p-a (tabuleiro)
-  (cond
-   ((null tabuleiro) nil)
-   (t
-    (let* ((linhas (append tabuleiro (colunas tabuleiro) (diagonais tabuleiro)))
-           (linhas-pecas (remove-if #'(lambda (z) 
-                                        (null z))
-                                    (mapcar #'(lambda (x) 
-                                                (remove-if #'(lambda (y) (eq y 0)) x))
-                                            linhas))))
-      (cond
-       ((null linhas-pecas) 0)
-       (t (reduce #'max (mapcar #'max (remove nil (mapcar #'(lambda (em-linha len) (and em-linha len))
-                                                          (mapcar #'sao-iguaisp linhas-pecas)
-                                                          (mapcar #'length linhas-pecas)))))))))))
-
-
-(defun sao-iguaisp (linha)
-  (labels ((eq-list (x &rest y) 
-             (cond 
-              ((null y) T) 
-              ((eq x (car y)) (apply #'eq-list x (cdr y)))
-              (t nil))))
-    (cond
-     ((null linha) nil)
-     (t (reduce #'(lambda (&optional a b) (or a b)) (apply #'mapcar #'eq-list linha))))))
 
 
 
