@@ -2,6 +2,23 @@
 (defvar *cortes-beta* 0)
 (defvar *nos-analisados* 0)
 
+(defparameter *dispersao* (make-hash-table))
+
+(defun print-hash-entry (key value)
+    (format t "The value associated with the key ~a is ~a~%" key value))
+
+
+
+(defun memoizacao (fn)
+ (let ((table *dispersao*))
+    (lambda (no  jogador tempo-final prof)
+      (or (gethash (no-estado no) table)
+          (let ((val (funcall fn no  jogador tempo-final prof)))
+            (setf (gethash (no-estado no) table) val)
+            (maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) table)
+            val))))
+ )
+
 (let (
   (*jogador -1)
   (*tabuleiro (tab))
