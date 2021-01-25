@@ -114,7 +114,7 @@
 (defun no-beta (no) (caddr no))
 (defun no-profundidade-alphabeta (no) (cadddr no))
 
-(defun sucessores-alphabeta (no operador peca)
+#|(defun sucessores-alphabeta (no operador peca)
   (cond
    ((null no) NIL)
    (t 
@@ -123,7 +123,7 @@
        ((null coordenadas) NIL)
        (t (mapcar #'(lambda (x) (cria-no-alphabeta 
                                  (funcall operador (tabuleiro-conteudo no) peca (car x) (cadr x))
-                                 (1+ (no-profundidade-alphabeta no)) no (no-alpha no) (no-beta no))) coordenadas)))))))
+                                 (1+ (no-profundidade-alphabeta no)) no (no-alpha no) (no-beta no))) coordenadas)))))))|#
 
 (defun sucessores-quatro (no operadoresf &optional (max-prof 0))
   (cond 
@@ -135,13 +135,13 @@
     (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
       (cond 
        ((null coordenadas) NIL)
-       (t (remove nil
-                  (mapcar #'(lambda (operador) (novo-sucessor no operador)) (funcall operadoresf (tabuleiro-conteudo no))))))))))
+       (t ;(funcall operadoresf (tabuleiro-conteudo no)))
+        (remove nil
+                  (mapcar #'(lambda (estado) (novo-sucessor no estado)) (funcall operadoresf (no-estado no))))))))))
 
-(defun novo-sucessor (teste x)
-  (let ((novo-estado (funcall x (no-estado teste))))
-    (cond ((null novo-estado) nil)
-	  (t (list novo-estado (no-alpha teste) (no-beta teste) (1+ (no-profundidade-alphabeta teste)) teste)))))
+(defun novo-sucessor (no x)
+    (cond ((null no) nil)
+	  (t (list x (no-alpha no) (no-beta no) (1+ (no-profundidade-alphabeta no)) no))))
 
 (defun operadores-quatro (estado-jogo)
   (let ((casas (casas-vazias (tabuleiro estado-jogo)))
@@ -149,7 +149,7 @@
     (apply #'append (mapcar #'(lambda (casa)
                 (mapcar #'(lambda (peca) (jogada (car casa) (cadr casa) peca)) pecas)) casas))))
   
-
+;Estado Tabuleiro sem reserva
 (defun tabuleiro-conteudo (no)
   (caar no))
 
@@ -222,19 +222,43 @@
 (defun no-solucaop (no)
   (if (null no) nil (quatro-linha-p (tabuleiro-conteudo no))))
 
+
+
 (defun avaliar-no (no peca)
-  (let ((posicoes (remove-if #'(lambda (x) (equal x '(0 0 0 0))) (append NIL (tabuleiro-conteudo no) (colunas (tabuleiro-conteudo no)) (diagonais (tabuleiro-conteudo no))))))
-    (apply #'+ (mapcar #'(lambda (x) (cond
-                                      ((= x 40) 1000) ; linha com 4 pecas
-                                      ((= x 31) 100) ; linha com 3 pecas e 1 vazio
-                                      ((= x 22) 10) ; linha com 2 pecas e 2 vazios
-                                      ((= x 13) 1) ; linha com 1peca e 3 vazio
-                                      (t 0)))
-                       (mapcar #'(lambda (x) (apply #'+ (mapcar #'(lambda (y) (cond
-                                                                               ((zerop y ) 1)
-                                                                               ((= peca y) 10)
-                                                                               (t 0)
-                                                                               )) x))) posicoes)))))
+  (labels ((contagem (lista pred predf)
+             (apply #'+ (mapcar #'pred
+                                (mapcar #'(lambda (x) (apply #'+ (mapcar #'(lambda (y) (cond
+                                                                                        ((eq y 0) 1)
+                                                                                        ((funcall predf y) 10)
+                                                                                        (t 0)
+                                                                                        )) x))) lista)))))            
+    (let* ((posicoes (remove-if #'(lambda (x) (equal x '(0 0 0 0))) (append NIL (tabuleiro-conteudo no) (colunas (tabuleiro-conteudo no)) (diagonais (tabuleiro-conteudo no)))))
+         
+           (linhas-pecas (remove-if #'(lambda (z) 
+                                        (null z))
+                                    (mapcar #'(lambda (x) 
+                                                (remove-if #'(lambda (y) (eq y 0)) x))
+                                            posicoes)))
+           (pecas (remove nil (mapcar #'(lambda (em-linha len) (cond 
+                                                                ((and em-linha len) len)
+                                                                (t 0)))
+                                      (mapcar #'sao-iguaisp linhas-pecas)
+                                      (mapcar #'length linhas-pecas)))))
+(values
+      (contagem pecas #'(lambda (x) (cond
+                                     ((= x 4) 1000) ; linha com 4 pecas
+                                     ((= x 3) 100) ; linha com 3 pecas e 1 vazio
+                                     ((= x 2) 10) ; linha com 2 pecas e 2 vazios
+                                     ((= x 1) 1) ; linha com 1 peca e 3 vazios
+                                     (t 0))) #'(lambda (y) (> y 0)))
+      (contagem posicoes #'(lambda (x) (cond
+                                        ((= x 40) 1000) ; linha com 4 pecas
+                                        ((= x 31) 100) ; linha com 3 pecas e 1 vazio
+                                        ((= x 22) 10) ; linha com 2 pecas e 2 vazios
+                                        ((= x 13) 1) ; linha com 1 peca e 3 vazios
+                                        (t 0))) #'(lambda (y) (listp y)))))))
 
 
 )
+
+#||#
