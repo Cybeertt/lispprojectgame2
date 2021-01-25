@@ -47,8 +47,8 @@
       )
    (let ((escolha (read)))
                (cond 
-                ((eq escolha 1) -1)
-                ((eq escolha 2) -2)))))
+                ((eq escolha 1) 1)
+                ((eq escolha 2) -1)))))
 
 (defun ler-limite ()
   (progn
@@ -64,9 +64,14 @@
         (t
             (write-line (write-to-string (car tab)))
             (exibir-tab (cdr tab))
-        )
-    )
-)
+        )))
+
+(defun ler-jogada (coord pecas)
+  (format t "Coordenadas: ~a: " coord)
+  (format t "Pecas: ~a: " pecas)
+
+  
+  
 
 (defun exibir-comeco-tab (tab)
 (terpri)

@@ -66,13 +66,17 @@
 (setf *jogador (outro-jogador *jogador)))
 
 
-(defun jogada-humana (l c p j)
+(defun jogada-humana (l c p)
+ (setf *tabuleiro (jogada l c p)))
+
+(defun jogada (l c p)
   (cond
-   ((not (casa-vaziap l c (tabuleiro *tabuleiro))) NIL)
+   ;((null (reserva problema)) nil)
+   ((not (casa-vaziap l c (tabuleiro *tabuleiro))) nil)
    (t 
-    (let* ((novo-problema *tabuleiro) (novo-tabuleiro (tabuleiro novo-problema)) (nova-reserva novo-problema))
-      (substituir-posicao c p (fila l novo-tabuleiro))
-      (setf (nth 1 nova-reserva) (remove-peca p nova-reserva))))))
+    (let ((novo-tabuleiro (copy-tree  *tabuleiro)))
+      (substituir-posicao c p (fila l (tabuleiro novo-tabuleiro)))
+      (list (tabuleiro novo-tabuleiro) (remove-peca p (reserva novo-tabuleiro)))))))
 
 
 
@@ -114,19 +118,47 @@
   (cond
    ((null no) NIL)
    (t 
-    (let ((coordenadas (casas-vazias (no-tabuleiro no))))
+    (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
       (cond 
        ((null coordenadas) NIL)
        (t (mapcar #'(lambda (x) (cria-no-alphabeta 
-                                 (funcall operador (no-tabuleiro no) peca (car x) (cadr x))
+                                 (funcall operador (tabuleiro-conteudo no) peca (car x) (cadr x))
                                  (1+ (no-profundidade-alphabeta no)) no (no-alpha no) (no-beta no))) coordenadas)))))))
+
+(defun sucessores-quatro (no operadoresf &optional (max-prof 0))
+  (cond 
+   ((null no) nil)
+   ((>= (no-profundidade-alphabeta no) max-prof) nil)
+
+   ((no-solucaop no) nil)
+   (t 
+    (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
+      (cond 
+       ((null coordenadas) NIL)
+       (t (remove nil
+                  (mapcar #'(lambda (operador) (novo-sucessor no operador)) (funcall operadoresf (tabuleiro-conteudo no))))))))))
+
+(defun novo-sucessor (teste x)
+  (let ((novo-estado (funcall x (no-estado teste))))
+    (cond ((null novo-estado) nil)
+	  (t (list novo-estado (no-alpha teste) (no-beta teste) (1+ (no-profundidade-alphabeta teste)) teste)))))
+
+(defun operadores-quatro (estado-jogo)
+  (let ((casas (casas-vazias (tabuleiro estado-jogo)))
+        (pecas (reserva estado-jogo)))
+    (apply #'append (mapcar #'(lambda (casa)
+                (mapcar #'(lambda (peca) (jogada (car casa) (cadr casa) peca)) pecas)) casas))))
+  
+
+(defun tabuleiro-conteudo (no)
+  (caar no))
 
 ; alphabeta final
 (defun alphabeta (no profundidade jogador)
   (labels ((alphabeta-aux (alphabeta-f alphabeta-no alphabeta-pred alphabeta-value)
              (let* ((value alphabeta-value)
                     (adversario (outro-jogador jogador))
-                    (descendentes (remove-if #'(lambda (x) (null x)) (sucessores-alphabeta no #'jogada-humano jogador)))
+                    (descendentes (remove-if #'(lambda (x) (null x)) (sucessores-alphabeta no #'jogada-humana jogador)))
                     (alpha-beta (funcall alphabeta-no no)))
                (dolist (d descendentes)
                  (let* ((value-aux (funcall alphabeta-f value (alphabeta d (- profundidade 1) adversario)))
@@ -136,7 +168,7 @@
                     (t (setf value value-aux) (setf alpha-beta alpha-beta-aux))))))))
     (cond
      ((or (zerop profundidade) (null (sucessores-alphabeta no #'jogada-humano jogador)))
-      (atualiza-jogada (no-tabuleiro no) jogador) ; atualiza se for solucao
+      ;(atualiza-jogada (no-tabuleiro no) jogador) ; atualiza se for solucao
       (avaliar-no no jogador))
      ((> jogador 0)
       (let* ((value most-positive-double-float))
@@ -189,4 +221,20 @@
 
 (defun no-solucaop (no)
   (if (null no) nil (quatro-linha-p (tabuleiro-conteudo no))))
+
+(defun avaliar-no (no peca)
+  (let ((posicoes (remove-if #'(lambda (x) (equal x '(0 0 0 0))) (append NIL (tabuleiro-conteudo no) (colunas (tabuleiro-conteudo no)) (diagonais (tabuleiro-conteudo no))))))
+    (apply #'+ (mapcar #'(lambda (x) (cond
+                                      ((= x 40) 1000) ; linha com 4 pecas
+                                      ((= x 31) 100) ; linha com 3 pecas e 1 vazio
+                                      ((= x 22) 10) ; linha com 2 pecas e 2 vazios
+                                      ((= x 13) 1) ; linha com 1peca e 3 vazio
+                                      (t 0)))
+                       (mapcar #'(lambda (x) (apply #'+ (mapcar #'(lambda (y) (cond
+                                                                               ((zerop y ) 1)
+                                                                               ((= peca y) 10)
+                                                                               (t 0)
+                                                                               )) x))) posicoes)))))
+
+
 )
