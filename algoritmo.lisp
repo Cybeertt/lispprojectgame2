@@ -12,7 +12,7 @@
 
 
 
-(defun memoizacao (fn)
+(defun memorizacao (fn)
  (let ((table *dispersao*))
     (lambda (no  jogador tempo-final prof)
       (or (gethash (no-estado no) table)
@@ -35,14 +35,11 @@
 
     (exibir-tab *tabuleiro)
     
-    (loop while (or (not (null (generate-moves *tabuleiro *jogador))) (not (null (generate-moves *tabuleiro (opposite *jogador)))) (equal 100 (length (remove-nil-value *tabuleiro))))
+    (loop while (or (not (no-solucaop *tabuleiro *jogador)) (not (no-solucaop *tabuleiro (outro-jogador *jogador))) (not (not (null (casas-vazias *tabuleiro)))))
       do
 
       (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
-      (setf *jogador (opposite *jogador))
-    )
-    
-  )
+      (setf *jogador (outro-jogador *jogador))))
 
 (defun humcom (tempo &optional (j1 1))
   (reiniciar)
@@ -83,24 +80,7 @@
 (defun reiniciar ()
     (setf *tabuleiro (tab))
     (setf *jogador 1)
-    (setf *best-play '(most-negative-fixnum 0 0))
-  )
-
-#|(defun negamax (no limit prof a b &optional (inicio (get-internal-real-time)))
-  (cond
-      
-      ((or (= prof 0) (>= (- (get-internal-real-time) inicio) limit)))
-
-    (t (let* (
-      (successores (gera-jogadas *tabuleiro *jogador ));;sucessores := OrderMoves(GenerateMoves(n))
-      )
-      
-      (succ-ciclo successors no limit prof a b inicio)
-    )
-   )
-  )
-)
-|#
+    (setf *best-play '(most-negative-fixnum 0 0)))
 
 (defun outro-jogador (j)
   (* -1 j))
@@ -222,18 +202,15 @@
 (defun no-solucaop (no)
   (if (null no) nil (quatro-linha-p (tabuleiro-conteudo no))))
 
-
-
-(defun avaliar-no (no peca)
+(defun avaliar-no (no jogador)
   (labels ((contagem (lista pred predf)
-             (apply #'+ (mapcar #'pred
+             (apply #'+ (mapcar #'(lambda (x) (funcall pred x))
                                 (mapcar #'(lambda (x) (apply #'+ (mapcar #'(lambda (y) (cond
                                                                                         ((eq y 0) 1)
                                                                                         ((funcall predf y) 10)
                                                                                         (t 0)
                                                                                         )) x))) lista)))))            
     (let* ((posicoes (remove-if #'(lambda (x) (equal x '(0 0 0 0))) (append NIL (tabuleiro-conteudo no) (colunas (tabuleiro-conteudo no)) (diagonais (tabuleiro-conteudo no)))))
-         
            (linhas-pecas (remove-if #'(lambda (z) 
                                         (null z))
                                     (mapcar #'(lambda (x) 
@@ -245,6 +222,7 @@
                                       (mapcar #'sao-iguaisp linhas-pecas)
                                       (mapcar #'length linhas-pecas)))))
 (values
+; pecas
       (contagem pecas #'(lambda (x) (cond
                                      ((= x 4) 1000) ; linha com 4 pecas
                                      ((= x 3) 100) ; linha com 3 pecas e 1 vazio
@@ -257,8 +235,5 @@
                                         ((= x 22) 10) ; linha com 2 pecas e 2 vazios
                                         ((= x 13) 1) ; linha com 1 peca e 3 vazios
                                         (t 0))) #'(lambda (y) (listp y)))))))
-
-
-)
 
 #||#
