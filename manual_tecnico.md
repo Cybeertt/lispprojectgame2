@@ -70,7 +70,6 @@ Neste manual encontram-se explicações sobre o jogo, como o iniciar, a estrutur
     * [Exibir-Comeco-Tab](#f-exibir-comeco-tab)
     * [Imprimir](#f-imprimir)
 * [Conslusão](#conclusao)
-* [Glossário](#glossario)
 
 ## <a name="doc-abstract">**Abstrato**</a>
 Este projeto tem com o intuito de aplicar conhecimentos adquiridos no ambito da cadeira curricular IA e realizar uma análise entre os algoritmos de prócura para os diferentes estados do jogo Quatro.
@@ -1472,18 +1471,12 @@ Imprime na consola o tabuleiro.
         (format file-stream "~%~t~t ~a" l)) tab)))
   )
 ```
-### <a name="#aplica-algoritmos-observacoes">Observações</a>
-Os algortimos BFS e DFS por vezes não conseguem chegar a uma solução, por exigir um maior volume de memória que a disponibizada pelo LispWorks. O problema ocorre quando são gerados muitos sucessores, que com a necessecidade de executar multiplas operações, enchem a heap do ListWorks, sendo inequisível realizar todas as operações a tempo de não ocupar toda a heap, resultando em Stack Overflow.
-
-Embora a ocupação total da heap possa ocurrer, existe uma outra situação que afeta o algoritmo DFS. O valor da profundidade pode impedir de encontrar uma solução, em que esta poderá estar níveis mais abaixo da máxima profundidade restrita.
-
-Por norma o algoritmo A* consegue obter uma solução, mas como é um algoritmo que espande todos os seus nós em memória, e tal como os algoritmos BFS e DFS, pode gerar Stack Overflow pela utilização máxima da heap do LispWorks. A diferença parte da utilização da heuristica, que permite de certa forma inteligente avaliar os nós que podem permitir encontrar uma solução mais rápidamente.
 
 ## <a name="conclusao">**Conclusão**</a>
-No percurso de desenvolvimento do presente projeto, verificá-mos que a recursividade é uma das carateristicas mais utilizadas quando se programa com a linguagem Common Lisp, que cria vastas oportunidades de gerar resultados com Stack Overflow mais rápidamente pela utilização máxima da heap, principalmente em LispWorks.
+O processo de criar um jogo estratégico, como dois adversários são similares em termos de funcionamento. As funções desenvolvidas, por maioria foram reutilizadas para os modos de jogo: Humano versos PC e PC versus PC, com algumas excessões.
 
-Um dos desafios prioritários é conseguir desenvolver um programa que não resulte em Stack Overflow quando se aplica os algoritmos de prócura BFS, DFS e A*, por serem algoritmos que têm cariz de gerar a árvore em memória. Embora existam diferenças entre os algortimos de prócura, na teoria, foi através da análise dos resultados das resoluções do nosso programa que conseguimos verificar essa diferença.
+No entanto, foi bastantes interessante aplicar esta metodologia em pártica, por ser não só uma mais valia, mas uma experiência, que permite demostrar a verdadeira Inteligência Artificial representada em jogos. Aceitamos que existem outros tipos de Inteligência Artificial mais desenvolvidos e aplicadas aos jogos atuais.
 
-Os resultados variam de PC para PC e existiram casos em que num PC resultava no retorno da solução e noutro em Stack Overflow. Embora existiram sempre a consistência em certos resultados que sempre resultaram em Stack Overflow, por limitações na memória heap do LispWorks de acordo com os algortimos de prócura [observados](#aplica-algoritmos-observacoes) anteriormente.
+A utilização do algoritmo Aplhabeta permitio criar referência para futuros projetos e pôs em perspetiva sobre os outros algoritmos utilizados na fase do projeto anterior. Uma observação que se encontrou comum a todos os algoritmos foi o erro de stack overflow quando existem demasiados nós sucessores a serem gerados ou à profundidade não ser suficiente para obter o nó solução.
 
-Em unanimidade e perante os resultados obtidos, observá-mos que o algortimo A* é o que mais consegue retornar uma solução e raramente ocupa a memória heap por inteiro, embora seja um algoritmo que espanda a àrvore toda. Desta forma concluímos que o algoritmo A* realmente é mais eficiente que os algoritmos BFS e DFS, e o mais fiável para obter soluções.
+Perante este trabalho, podemos concluir que não é uma mais valia, só em termos académicos, como também é uma influência para qualquer tipo de software a ser desenvolvido.
