@@ -1177,6 +1177,31 @@ Retorna o estado do nó.
 )
 ```
 
+#### <a nome="f-p-no-pai">No-Alpha</a>
+Retorna o nó Alfa do nó.
+
+**Parâmetros**
+
+*no - Nó*
+
+```lisp
+; funcao
+(defun no-alpha (no) (cadr no))
+(defun no-beta (no) (caddr no))
+```
+
+#### <a nome="f-p-no-pai">No-Beta</a>
+Retorna o nó Beta do nó.
+
+**Parâmetros**
+
+*no - Nó*
+
+```lisp
+; funcao
+(defun no-beta (no) (caddr no))
+```
+
 #### <a nome="f-p-no-pai">No-Pai</a>
 Retorna o nó predecessor do nó.
 
@@ -1186,12 +1211,10 @@ Retorna o nó predecessor do nó.
 
 ```lisp
 ; funcao
-(defun no-pai (no)
-  (cddr no)
-)
+(defun no-pai (no) (car (cddddr no)))
 ```
 
-#### <a nome="f-p-no-profundidade">No-Profundidade</a>
+#### <a nome="f-p-no-profundidade">No-Profundidade-Alphabeta</a>
 Retorna a profundidade do nó.
 
 **Parâmetros**
@@ -1200,9 +1223,7 @@ Retorna a profundidade do nó.
 
 ```lisp
 ; funcao
-(defun no-profundidade (no)
-  (cadr no)
-)
+(defun no-profundidade-alphabeta (no) (cadddr no))
 ```
 
 #### <a nome="f-p-novo-sucessor">Novo-Sucessor</a>
@@ -1224,7 +1245,7 @@ Gera um novo nó sucessor, recebendo um nó por parâmetro.
 ```
 
 #### <a nome="f-p-sucessores-quatro">Sucessores-Quatro</a>
-Gera sucessores de um nó especificamente desenvolvido para o  problema quatro, de acordo com um dos algoritmos de prócura, DFS ou BFS.
+Gera sucessores de um nó especificamente desenvolvido para o problema quatro.
 
 **Parâmetros**
 
@@ -1232,19 +1253,24 @@ Gera sucessores de um nó especificamente desenvolvido para o  problema quatro, 
 
 *operadoresf - Função com operadores*
 
-*algoritmo - Algoritmo de prócura DFS ou BFS*
-
 *max-prof - Máxima profundidade (opcional)*
 
 ```lisp
 ; funcao
-(defun sucessores-quatro (no operadoresf algoritmo &optional (max-prof nil))
-  (cond ((and max-prof (eq algoritmo 'dfs)
-	      (>= (no-profundidade no)
-		  max-prof)) nil)
-	(t (remove nil
-		   (mapcar #'(lambda (operador) (novo-sucessor no operador)) (funcall operadoresf (no-estado no))))))
-)
+(defun sucessores-quatro (no operadoresf &optional (max-prof 0))
+  (cond 
+   ((null no) nil)
+   ((>= (no-profundidade-alphabeta no) max-prof) nil)
+
+   ((no-solucaop no) nil)
+   (t 
+    (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
+      (cond 
+       ((null coordenadas) NIL)
+       (t ;(funcall operadoresf (tabuleiro-conteudo no)))
+        (remove nil
+                  (mapcar #'(lambda (estado) (novo-sucessor no estado)) (funcall operadoresf (no-estado no))))))))))
+
 ```
 
 #### <a nome="f-p-operadores-quatro">Operadores-Quatro</a>
@@ -1301,41 +1327,15 @@ Carrega ficheiros necessários para o funcionamento do programa.
 )
 ```
 
-#### <a name="f-proj-startup">Startup</a>
-Inicializa o programa na consola.
-
-```lisp
-; funcao
-(defun startup ()
-  (menu-principal (asset-path "problemas.dat"))
-)
-```
-
-#### <a name="f-proj-obter-problemas">Obter-Problemas</a>
-Retorna uma lista de problemas lidos de um ficheiro.
-
-**Parâmetros**
-
-*file - Ficheiro com problemas*
-
-```lisp
-; funcao
-(defun obter-problemas (file)
-  (with-open-file (s file)
-    (let ((problems nil))
-      (do ((prob (read s) (read s nil 'eof))) ((eq prob 'eof) (reverse problems))
-        (setq problems (cons prob problems)))))
-)
-```
 
 #### <a name="f-proj-menu-principal">Menu-Principal</a>
-Imprime na consola um menu de escolhas: Resolver Jogo, Regras do Jogo, Mostrar Tabuleiros, Sair.
+Imprime na consola um menu de escolhas: Humano contra Computador, Computador contra Computador, Sair.
 
 Cada escolha encontra-se associada a uma valor numérico que permite executar a ação escolhida. Caso selecionar uma opção inválida, será pedido novamente para inserir uma opção das disponíveis.
 
-* Humano contra Computador: Chama a função [Tabuleiros](#f-proj-tabuleiros).
+* Humano contra Computador: Chama a função [HvC](#f-proj-HvC).
 
-* Computador contra Computador: Chama a função [Regras](#f-proj-regras).
+* Computador contra Computador: Chama a função [CvC](#f-CvC).
 
 
 * Sair: Sai do menú atual.
@@ -1391,18 +1391,13 @@ ________________________________________________________________________________
 )
 ```
 
-#### <a name="f-proj-tabuleiros">Tabuleiros</a>
-Imprime na consola um tabuleiro correspondente ao do ficheiro lido, desde que este exista na mesma posição que aparece no menu.
+#### <a name="f-proj-tabuleiros">ESCOLHA O PRIMEIRO JOGADOR</a>
+Imprime na consola um tabuleiro correspondente ao jogo e questiona qual o primeiro a jogar.
 
-Cada escolha encontra-se associada a uma valor numérico que permite executar a ação escolhida. Caso selecionar uma opção inválida, será pedido novamente para inserir uma opção das disponíveis.
+* Humano: O primeiro a jogar é o humano.
 
-Por definição encontram-se problemas de A a F, préviamente disponíveis.
+* Computador : O primeiro a jogar é o computador.
 
-* Problema (Letra): Seleciona o problema com a especifica posição no ficheiro.
-
-* Problema Teste: Seleciona o problema que deverá ser colocado no final do ficheiro que contém todos os problemas. *Este problema será utilizado para testar o projeto, deste modo não se encontra no ficheiro atual de problemas*.
-
-* Home Menu: Chama a função [Menu-Principal](#f-proj-menu-principal).
 
 **Parâmetros**
 
@@ -1434,21 +1429,13 @@ Escreve num ficheiro tabelas com as estatisticas entre os vários algoritmos par
 
 **Parâmetros**
 
-*start-board - Tabela inicial*
+*tab - Tabela atual*
 
-*solution-node - Nó com o estado solução*
-
-*start-time - Tempo de inicio de execução*
-
-*end-time - Tempo de fim da execução*
-
-*algrithm - Algoritmo*
+*tempo - tempo atual de jogo*
 
 ```lisp
 ; funcao
-(defun escreve-log (tab tempo nos)
-  "Writes the statistics file with the solution and it's statistic data, for breadth first and depth first algorithms"
-
+(defun escreve-log (tab tempo)
  
          (with-open-file (file (asset-path "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
            (progn 
