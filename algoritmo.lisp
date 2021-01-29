@@ -7,15 +7,13 @@
 (defun print-hash-entry (key value)
     (format t "The value associated with the key ~a is ~a~%" key value))
 
-(defun no-estado (teste)
-  (car teste))
+(defun no-estado (no)
+  (car no))
 
 
 (let (
   (*jogador 1)
-  (*tabuleiro (tab))
-  (*best-play '(most-negative-fixnum -999 nil))
-)
+  (*tabuleiro (tab)))
 
 
 (defun jogar-quatro (tab tempo)
@@ -48,7 +46,7 @@
 
     (exibir-tab *tabuleiro)
     
-    (loop while (or (not (no-solucaop *tabuleiro *jogador)) (not (no-solucaop *tabuleiro (outro-jogador *jogador))) (not (not (null (casas-vazias *tabuleiro)))))
+    (loop while (or (not (no-solucaop *tabuleiro *jogador)) (not (no-solucaop *tabuleiro (outro-jogador *jogador))) (not (null (casas-vazias *tabuleiro))))
       do
 
       (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
@@ -75,14 +73,8 @@
 
 (setf *jogador (outro-jogador *jogador)))
 
-
-(defun jogada-humana (l c p estado)
- (setf *tabuleiro (jogada l c p estado)))
-
-
 (defun jogada (l c p tab)
   (cond
-   ;((null (reserva problema)) nil)
    ((not (casa-vaziap l c (tabuleiro tab))) nil)
    (t 
     (let ((novo-tabuleiro (copy-tree  tab)))
@@ -93,8 +85,7 @@
 
 (defun reiniciar ()
     (setf *tabuleiro (tab))
-    (setf *jogador 1)
-    (setf *best-play '(most-negative-fixnum 0 0)))
+    (setf *jogador 1))
 
 (defun outro-jogador (j)
   (* -1 j))
@@ -103,21 +94,14 @@
 (defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (alfa most-negative-double-float) (beta most-positive-double-float))
   (list estado alfa beta profundidade pai))
 
+;Estado Tabuleiro sem reserva
+(defun tabuleiro-conteudo (no)
+  (caar no))
+
 (defun no-pai (no) (car (cddddr no)))
 (defun no-alpha (no) (cadr no))
 (defun no-beta (no) (caddr no))
 (defun no-profundidade-alphabeta (no) (cadddr no))
-
-#|(defun sucessores-alphabeta (no operador peca)
-  (cond
-   ((null no) NIL)
-   (t 
-    (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
-      (cond 
-       ((null coordenadas) NIL)
-       (t (mapcar #'(lambda (x) (cria-no-alphabeta 
-                                 (funcall operador (tabuleiro-conteudo no) peca (car x) (cadr x))
-                                 (1+ (no-profundidade-alphabeta no)) no (no-alpha no) (no-beta no))) coordenadas)))))))|#
 
 (defun sucessores-quatro (no operadoresf &optional (max-prof 0))
   (cond 
@@ -142,10 +126,7 @@
         (pecas (reserva estado-jogo)))
     (apply #'append (mapcar #'(lambda (casa)
                 (mapcar #'(lambda (peca) (jogada (car casa) (cadr casa) peca estado-jogo)) pecas)) casas))))
-  
-;Estado Tabuleiro sem reserva
-(defun tabuleiro-conteudo (no)
-  (caar no))
+
 
 ; alphabeta final
 #|(defun alphabeta (no profundidade jogador)
@@ -177,14 +158,12 @@
 (defun ab (no profundidade jogador)
   (cond
    ((or (zerop profundidade) (null (sucessores-quatro no #'operadores-quatro profundidade)))
-    ;(atualiza-jogada (no-tabuleiro no) jogador) ; atualiza se for solucao
     (avaliar-no no jogador))
    ((> jogador 0)
     (let* ((value-max most-negative-double-float)
            (adversario (outro-jogador jogador))
            (descendentes (remove-if #'(lambda (x) (null x)) 
                                     (sucessores-quatro no #'operadores-quatro profundidade))) (alpha (no-alpha no)))    
-;provisorio
       (dolist (d descendentes)
         (let* ((value-aux (max value-max (ab d (- profundidade 1) adversario)))
                (alpha-aux (max alpha value-aux)))
@@ -196,7 +175,6 @@
              (adversario (outro-jogador jogador))
              (descendentes (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
              (beta (no-beta no)))
-;provisorio
         (dolist (d descendentes)
           (let* ((value-aux (min value-min (ab d (- profundidade 1) adversario)))
                  (beta-aux (min beta value-aux)))
@@ -272,13 +250,7 @@
                                       ((= x 3) 1000) ; linha com 3 pecas e 1 vazio
                                       ((= x 2) 10) ; linha com 2 pecas e 2 vazios
                                       ((= x 1) 1) ; linha com 1 peca e 3 vazios
-                                      (t 0))) #'(lambda (y) (> y 0))))
-       #|(contagem posicoes #'(lambda (x) (cond
-                                         ((= x 40) 10000) ; linha com 4 pecas
-                                         ((= x 31) 1000) ; linha com 3 pecas e 1 vazio
-                                         ((= x 22) 10) ; linha com 2 pecas e 2 vazios
-                                         ((= x 13) 1) ; linha com 1 peca e 3 vazios
-                                         (t 0))) #'(lambda (y) (listp y)))|#)))
+                                      (t 0))) #'(lambda (y) (> y 0)))))))
 
 
 )
