@@ -22,10 +22,10 @@
      )))
 
 
-(defun pretty-print ()
+(defun pretty-print (estado)
   (format t "~%")
-  (format t "~S ~%" (tabuleiro (tab)))
-  (format t "~S ~%" (reserva (tab))))
+  (format t "~S ~%" (tabuleiro estado))
+  (format t "~S ~%" (reserva estado)))
 
 (defun tabuleiro (problema)
   (car problema))
