@@ -56,19 +56,18 @@
       (format t "   ~%------ESCREVA O TEMPO LIMITE DO COMPUTADOR (1000 >= TEMPO [ms] >= 5000)------")
       (terpri)
       )
-    (ler)))
+    (read)))
 
 (defun exibir-tab (tab)
     (cond
         ((null tab) '())
         (t
             (write-line (write-to-string (car tab)))
-            (exibir-tab (cdr tab))
-        )))
+            (exibir-tab (cdr tab)))))
 
 (defun ler-jogada (coord pecas)
   (format t "Coordenadas: ~a: " coord)
-  (format t "Pecas: ~a: " pecas)
+  (format t "Pecas: ~a: " pecas))
 
   
   
@@ -83,8 +82,7 @@
 (terpri)
 (format t "-----------------TABULEIRO INICIAL-----------------")
 (terpri)
-(terpri)
-)
+(terpri))
 
 (defun Imprimir (tab &optional (file-stream t))
   "lista o tabuleiro"
