@@ -93,7 +93,7 @@
   )
 
 
-(defun escreve-log (tab tempo nos)
+(defun escreve-log (tab tempo)
   "Writes the statistics file with the solution and it's statistic data, for breadth first and depth first algorithms"
 
  

@@ -11,23 +11,36 @@
   (car teste))
 
 
-
-(defun memorizacao (fn)
- (let ((table *dispersao*))
-    (lambda (no  jogador tempo-final prof)
-      (or (gethash (no-estado no) table)
-          (let ((val (funcall fn no  jogador tempo-final prof)))
-            (setf (gethash (no-estado no) table) val)
-            (maphash #'(lambda (k v) (format t "~a => ~a~%" k v)) table)
-            val))))
- )
-
 (let (
   (*jogador 1)
   (*tabuleiro (tab))
   (*best-play '(most-negative-fixnum -999 nil))
 )
 
+
+(defun jogar-quatro (tab tempo)
+    (let* (
+      (comecar (get-internal-real-time));;start-time in miliseconds
+      (op (ab (no 1 -1)))
+      )
+
+    (cond
+      ((and (null (first indexes-player)) (null (second indexes-player)))
+        (setf op (max-first-move-value *player *board))
+        (setf jogada-atualizada (jogada linha coluna peca *tabuleiro))
+      )
+    )
+
+    (cond
+      ((not (null jogada-atualizada))
+        (display-computer-move *player (position-indexes-to-chess indexes-move) board-with-updated-player-position)
+
+        (sum-points move)
+
+        (escreve-log jogada-atualizada (get-play-time-milisecs play-start-time))
+        jogada-atualizada
+      )
+      (t *tabuleiro))))
 
 
 (defun comcom (tempo)
@@ -65,6 +78,7 @@
 
 (defun jogada-humana (l c p estado)
  (setf *tabuleiro (jogada l c p estado)))
+
 
 (defun jogada (l c p tab)
   (cond
@@ -134,7 +148,7 @@
   (caar no))
 
 ; alphabeta final
-(defun alphabeta (no profundidade jogador)
+#|(defun alphabeta (no profundidade jogador)
   (labels ((alphabeta-aux (alphabeta-f alphabeta-no alphabeta-pred alphabeta-value)
              (let* ((value alphabeta-value)
                     (adversario (outro-jogador jogador))
@@ -158,7 +172,7 @@
      (t
       (let* ((value most-positive-double-float))
         (alphabeta-aux #'min #'no-beta (lambda (x) (<= x (no-alpha no))) value)
-      value)))))
+      value)))))|#
 
 (defun ab (no profundidade jogador)
   (cond
@@ -268,4 +282,3 @@
 
 
 )
-#||#
