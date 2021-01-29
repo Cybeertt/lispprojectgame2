@@ -74,7 +74,7 @@ Neste manual encontram-se explicações sobre o jogo, como o iniciar, a estrutur
 ## <a name="doc-abstract">**Abstrato**</a>
 Este projeto tem com o intuito de aplicar conhecimentos adquiridos no ambito da cadeira curricular IA e realizar uma análise entre os algoritmos de prócura para os diferentes estados do jogo Quatro.
 
-Quatro, é um jogo que contém um tabuleiro 4x4 e 16 peças com quatro carateristicas. Cada carateristica de uma peça utiliza dois valores possíveis, tal como um sistema binário, permitindo fazer combinações de 16 peças. Por norma uma peça tem 14 peças com pelo menos uma carateristica em comum e 1 peça sem qualquer carateristica em comum.
+Quatro, é um jogo que contém um tabuleiro 4x4 e 16 peças com quatro carateristicas. Cada carateristica de uma peça utiliza dois valores possíveis, tal como um sistema binário, permitindo fazer combinações de 16 peças. Por norma, para uma peça existem 14 peças com pelo menos uma carateristica em comum e 1 peça sem qualquer carateristica em comum.
 
 Quatro, é um jogo sequêncial disputado por 2 competidores.
 O jogo é realizado num tabuleiro 4x4 e 16 peças com 4 carateristicas.
