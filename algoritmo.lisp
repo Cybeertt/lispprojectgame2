@@ -15,16 +15,15 @@
   (*jogador 1)
   (*tabuleiro (tab)))
 
-
+#|
 (defun jogar-quatro (tab tempo)
     (let* (
-      (comecar (get-internal-real-time));;start-time in miliseconds
-      (op (ab (no 1 -1)))
+      (op (ab (tab 1 *jogador)))
+      
       )
 
     (cond
       ((and (null (first indexes-player)) (null (second indexes-player)))
-        (setf op (max-first-move-value *player *board))
         (setf jogada-atualizada (jogada linha coluna peca *tabuleiro))
       )
     )
@@ -33,12 +32,11 @@
       ((not (null jogada-atualizada))
         (display-computer-move *player (position-indexes-to-chess indexes-move) board-with-updated-player-position)
 
-        (sum-points move)
 
         (escreve-log jogada-atualizada (get-play-time-milisecs play-start-time))
         jogada-atualizada
       )
-      (t *tabuleiro))))
+      (t *tabuleiro))))|#
 
 
 (defun comcom (tempo)
@@ -51,13 +49,13 @@
 
       (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
       (setf *jogador (outro-jogador *jogador))))
-
+#|
 (defun humcom (tempo &optional (j1 1))
   (reiniciar)
 
   (setf *jogador j1)
   (exibir-tab *tabuleiro)
-
+  (loop while (or (not (no-solucaop *tabuleiro *jogador)) (not (no-solucaop *tabuleiro (outro-jogador *jogador))) (not (null (casas-vazias *tabuleiro))))
   (cond
    ((= j1 1)
     (let* ((jog-dis (casas-vazias (tabuleiro(*tabuleiro))))
@@ -71,7 +69,7 @@
     (exibir-tab *tabuleiro))
    (t (setf *tabuleiro (jogar *tabuleiro tempo)))))
 
-(setf *jogador (outro-jogador *jogador)))
+(setf *jogador (outro-jogador *jogador))))|#
 
 (defun jogada (l c p tab)
   (cond
@@ -237,8 +235,7 @@
                                                                                              (t 0)
                                                                                              )) x))) lista)))))))           
     (let* ((posicoes (remove-if #'(lambda (x) (equal x '(0 0 0 0))) (append NIL (tabuleiro-conteudo no) (colunas (tabuleiro-conteudo no)) (diagonais (tabuleiro-conteudo no)))))
-           (linhas-pecas (remove-if #'(lambda (z) 
-                                        (null z))
+           (linhas-pecas (remove-if #'(lambda (z) (null z))
                                     (mapcar #'(lambda (x) (remove-if #'(lambda (y) (eq y 0)) x)) posicoes)))
            (pecas (remove nil (mapcar #'(lambda (em-linha len) (cond 
                                                                 ((and em-linha len) len)
@@ -252,5 +249,14 @@
                                       ((= x 1) 1) ; linha com 1 peca e 3 vazios
                                       (t 0))) #'(lambda (y) (> y 0)))))))
 
+(defun sumalpha (no j)
+  (cond
+   ((null no) nil)
+   (t (+ (no-alpha no) (* j (avaliar-no no j))))))
 
+(defun pontuacao ()
+  '((1000 2000 3000 4000) (5000 6000 7000 8000) (9000 10000 11000 12000) (13000 14000 15000 16000)))
+
+(defun pont-max (p)
+  (apply #'+ (mapcar #'(lambda (x) (apply #'+ x)) (mapcar #'(lambda (lista) lista) p))))
 )
