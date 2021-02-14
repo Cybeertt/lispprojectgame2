@@ -38,7 +38,7 @@
       )
       (t *tabuleiro))))|#
 
-
+#|
 (defun comcom (tempo)
     (reiniciar)
 
@@ -49,7 +49,7 @@
 
       (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
       (setf *jogador (outro-jogador *jogador))))
-#|
+
 (defun humcom (tempo &optional (j1 1))
   (reiniciar)
 
@@ -66,8 +66,28 @@
             (setf *tabuleiro (jogada-humana (car jogada) (cadr jogada) (caddr jogada) *jogador)))))
 
     (terpri)
-    (exibir-tab *tabuleiro))
-   (t (setf *tabuleiro (jogar *tabuleiro tempo)))))
+    (exibir-tab *tabuleiro)))
+   (t (setf *tabuleiro (jogar *tabuleiro tempo))))
+
+  ((equal *player -1)
+            (let* (
+              (moves (generate-moves *board *player))
+              (moves-avaliable (values-to-chess moves *board))
+            )
+
+            (cond
+            ((null moves-avaliable)
+            ;;adicionar tempo da jogada do humano?????
+              (setf *board (human-play (read-play (values-to-chess (car *board) *board)))))
+            (t (setf *board (human-play (read-play moves-avaliable))))
+            )
+          )
+
+          (terpri)
+          (display-board *board)
+        )
+        (t (setf *board (jogar *board time)))
+      )
 
 (setf *jogador (outro-jogador *jogador))))|#
 
@@ -89,7 +109,7 @@
   (* -1 j))
 
 
-(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (alfa most-negative-double-float) (beta most-positive-double-float))
+(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (alfa (- (limit-max-pontuacao (pontuacao)))) (beta (limit-max-pontuacao (pontuacao))))
   (list estado alfa beta profundidade pai))
 
 ;Estado Tabuleiro sem reserva
@@ -105,60 +125,28 @@
   (cond 
    ((null no) nil)
    ((>= (no-profundidade-alphabeta no) max-prof) nil)
-
    ((no-solucaop no) nil)
-   (t 
-    (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
+   (t (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
       (cond 
        ((null coordenadas) NIL)
-       (t ;(funcall operadoresf (tabuleiro-conteudo no)))
-        (remove nil
-                  (mapcar #'(lambda (estado) (novo-sucessor no estado)) (funcall operadoresf (no-estado no))))))))))
+       (t (remove nil (mapcar #'(lambda (estado) (novo-sucessor no estado)) (funcall operadoresf (no-estado no))))))))))
 
 (defun novo-sucessor (no x)
     (cond ((null no) nil)
 	  (t (list x (no-alpha no) (no-beta no) (1+ (no-profundidade-alphabeta no)) no))))
 
 (defun operadores-quatro (estado-jogo)
-  (let ((casas (casas-vazias (tabuleiro estado-jogo)))
+  (let* ((casas (casas-vazias (tabuleiro estado-jogo)))
         (pecas (reserva estado-jogo)))
-    (apply #'append (mapcar #'(lambda (casa)
-                (mapcar #'(lambda (peca) (jogada (car casa) (cadr casa) peca estado-jogo)) pecas)) casas))))
+    (apply #'append (mapcar #'(lambda (casa) (mapcar #'(lambda (peca) (jogada (car casa) (cadr casa) peca estado-jogo)) pecas)) casas))))
 
-
-; alphabeta final
-#|(defun alphabeta (no profundidade jogador)
-  (labels ((alphabeta-aux (alphabeta-f alphabeta-no alphabeta-pred alphabeta-value)
-             (let* ((value alphabeta-value)
-                    (adversario (outro-jogador jogador))
-                    (descendentes (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
-                    (alpha-beta (funcall alphabeta-no no)))
-               (dolist (d descendentes)
-                 (let* ((value-aux (funcall alphabeta-f value (alphabeta d (- profundidade 1) adversario)))
-                        (alpha-beta-aux (funcall alphabeta-f alpha-beta value-aux)))
-                   (cond
-                    ((no-solucaop d) (setf value value-aux) (setf alpha-beta alpha-beta-aux) (return))
-                    ((funcall alphabeta-pred (funcall alphabeta-no no)) (return))
-                    (t (setf value value-aux) (setf alpha-beta alpha-beta-aux))))))))
-    (cond
-     ((or (zerop profundidade) (null (sucessores-quatro no #'operadores-quatro profundidade)))
-      ;(atualiza-jogada (no-tabuleiro no) jogador) ; atualiza se for solucao
-      (avaliar-no no jogador))
-     ((> jogador 0)
-      (let* ((value most-positive-double-float))
-        (alphabeta-aux #'max #'no-alpha (lambda (x) (>= x (no-beta no))) value)
-        value))
-     (t
-      (let* ((value most-positive-double-float))
-        (alphabeta-aux #'min #'no-beta (lambda (x) (<= x (no-alpha no))) value)
-      value)))))|#
 
 (defun ab (no profundidade jogador)
   (cond
    ((or (zerop profundidade) (null (sucessores-quatro no #'operadores-quatro profundidade)))
     (avaliar-no no jogador))
    ((> jogador 0)
-    (let* ((value-max most-negative-double-float)
+    (let* ((value-max (- (limit-max-pontuacao (pontuacao))))
            (adversario (outro-jogador jogador))
            (descendentes (remove-if #'(lambda (x) (null x)) 
                                     (sucessores-quatro no #'operadores-quatro profundidade))) (alpha (no-alpha no)))    
@@ -169,7 +157,7 @@
            ((no-solucaop d) (setf value-max value-aux) (setf alpha alpha-aux) (return))
            ((>= alpha-aux (no-beta no)) (return))
            (t (setf value-max value-aux) (setf alpha alpha-aux))))) value-max))
-   (t (let* ((value-min most-positive-double-float)
+   (t (let* ((value-min (limit-max-pontuacao (pontuacao)))
              (adversario (outro-jogador jogador))
              (descendentes (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
              (beta (no-beta no)))
@@ -254,9 +242,18 @@
    ((null no) nil)
    (t (+ (no-alpha no) (* j (avaliar-no no j))))))
 
+(defun subtractbeta (no j)
+  (cond
+   ((null no) nil)
+   (t (- (no-beta no) (* j (avaliar-no no j))))))
+
 (defun pontuacao ()
   '((1000 2000 3000 4000) (5000 6000 7000 8000) (9000 10000 11000 12000) (13000 14000 15000 16000)))
 
-(defun pont-max (p)
+(defun limit-max-pontuacao (p)
   (apply #'+ (mapcar #'(lambda (x) (apply #'+ x)) (mapcar #'(lambda (lista) lista) p))))
+
+(defun p ()
+'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) -136000 136000 0 NIL))
+
 )

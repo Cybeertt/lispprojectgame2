@@ -95,7 +95,7 @@
   "Writes the statistics file with the solution and it's statistic data, for breadth first and depth first algorithms"
 
  
-         (with-open-file (file (asset-path "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
+         (with-open-file (file (caminho "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
            (progn 
              (terpri)
                 (format file "~%~t------------:JOGADA------------")
