@@ -237,6 +237,8 @@
                                       ((= x 1) 1) ; linha com 1 peca e 3 vazios
                                       (t 0))) #'(lambda (y) (> y 0)))))))
 
+;; no: alphabeta
+;; j: {-1, 1}
 (defun sumalpha (no j)
   (cond
    ((null no) nil)
@@ -247,13 +249,67 @@
    ((null no) nil)
    (t (- (no-beta no) (* j (avaliar-no no j))))))
 
+;; tabuleiro com pontuacao
 (defun pontuacao ()
   '((1000 2000 3000 4000) (5000 6000 7000 8000) (9000 10000 11000 12000) (13000 14000 15000 16000)))
 
-(defun limit-max-pontuacao (p)
-  (apply #'+ (mapcar #'(lambda (x) (apply #'+ x)) (mapcar #'(lambda (lista) lista) p))))
+;; pontuacao, remover da coordenada o valor
+(defun casas-n-vazias (tab &optional (l 0))
+  (labels (( coordenadas (fila l &optional (c 0))
+             (cond
+              ((null fila) nil)
+              ((listp (car fila)) ; zerop
+               (cons (list l c) (coordenadas (cdr fila) l (1+ c))))
+              (t (coordenadas (cdr fila) l (1+ c))))))
+             (cond 
+              ((null tab) nil)
+              (t (append (coordenadas (car tab) l) 
+                         (casas-n-vazias (cdr tab) (1+ l)))))))
 
+#|SUBSTITUIR
+(defun substituir-posicao (i p fila-tabuleiro)
+  (cond
+   ((or (null p) (null fila-tabuleiro)) NIL)
+   (t (setf (nth i fila-tabuleiro) p))))
+|#
+
+(defun nova-pontuacao (tabuleiro)
+  (let ((tabuleiro-pontuacao (copy-tree (pontuacao))) (ocupadas (casas-n-vazias tabuleiro)))
+    (cond
+     ((null ocupadas) 0)
+     (t (mapcar #'(lambda (x) (substituir-posicao (cadr x) 0 (fila (car x) tabuleiro-pontuacao))) ocupadas)
+        tabuleiro-pontuacao))))
+      ;(substituir-posicao c p (fila l (tabuleiro novo-tabuleiro)))
+      ;(substituir-posicao (cadr x) 0 (fila (car x) tabuleiro-pontuacao))
+;; calculo de pontuacao
+;; p: (pontuacao)
+(defun limit-max-pontuacao (pontuacao)
+  (apply #'+ (mapcar #'(lambda (x) (apply #'+ x)) (mapcar #'(lambda (lista) lista) pontuacao))))
+
+
+;; tabuleiro teste
 (defun p ()
 '(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) -136000 136000 0 NIL))
 
 )
+
+#|
+(avaliar-no (cria-no-alphabeta (tab)) 1)
+0
+
+(sumalpha (cria-no-alphabeta (tab)) 1)
+-136000
+
+(subtractbeta (cria-no-alphabeta (tab)) 1)
+136000
+
+(limit-max-pontuacao (pontuacao))
+136000
+
+(casas-n-vazias (tabuleiro (no-estado (p))))
+((0 0) (0 2) (0 3) (1 3) (2 0) (2 2) (3 1))
+
+(limit-max-pontuacao (nova-pontuacao (tabuleiro (no-estado (p)))))
+86000
+
+|#

@@ -22,10 +22,10 @@
      )))
 
 
-(defun pretty-print (estado)
+(defun pretty-print (tabuleiro)
   (format t "~%")
-  (format t "~S ~%" (tabuleiro estado))
-  (format t "~S ~%" (reserva estado)))
+  (format t "~S ~%" (tabuleiro tabuleiro))
+  (format t "~S ~%" (reserva tabuleiro)))
 
 (defun tabuleiro (problema)
   (car problema))
@@ -73,22 +73,17 @@
     (t (append (coordenadas (car tab) l) 
      (casas-vazias (cdr tab) (1+ l)))))) 
 
-
-(defun coordenadas (fila l &optional (c 0))
-  (cond
-   ((null fila) nil)
-   ((eq (car fila) 0) 
-    (cons (list l c) (coordenadas (cdr fila) l (1+ c))))
-   (t (coordenadas (cdr fila) l (1+ c)))))
-
-
-(defun remove-peca (p reserva)
-  (let ((predp #'(lambda (p e) (equal p e))))
-    (cond
-     ((or (null reserva) (null p)) NIL)
-     ((funcall predp p (car reserva)) (remove-peca p (cdr reserva)))
-     (t (cons (car reserva) (remove-peca p (cdr reserva)))))))
-
+(defun casas-vazias (tab &optional (l 0))
+  (labels (( coordenadas (fila l &optional (c 0))
+             (cond
+              ((null fila) nil)
+              ((eq (car fila) 0) 
+               (cons (list l c) (coordenadas (cdr fila) l (1+ c))))
+              (t (coordenadas (cdr fila) l (1+ c))))))
+             (cond 
+              ((null tab) nil)
+              (t (append (coordenadas (car tab) l) 
+                         (casas-vazias (cdr tab) (1+ l)))))))
 
 (defun substituir-posicao (i p fila-tabuleiro)
   (cond
@@ -101,9 +96,10 @@
 (defun diagonais (tabuleiro)
   (list (diagonal-direita tabuleiro) (diagonal-esquerda tabuleiro)))
 
-
-
-
-
-
-
+(defun jogada (l c p tab)
+  (cond
+   ((not (casa-vaziap l c (tabuleiro tab))) nil)
+   (t 
+    (let ((novo-tabuleiro (copy-tree  tab)))
+      (substituir-posicao c p (fila l (tabuleiro novo-tabuleiro)))
+      (list (tabuleiro novo-tabuleiro) (remove-peca p (reserva novo-tabuleiro)))))))
