@@ -67,11 +67,7 @@
 (defun casa-vaziap (l c tabuleiro)
   (numberp (celula l c tabuleiro)))
 
-(defun casas-vazias (tab &optional (l 0))
-  (cond 
-   ((null tab) nil)
-    (t (append (coordenadas (car tab) l) 
-     (casas-vazias (cdr tab) (1+ l)))))) 
+
 
 (defun casas-vazias (tab &optional (l 0))
   (labels (( coordenadas (fila l &optional (c 0))
@@ -84,6 +80,13 @@
               ((null tab) nil)
               (t (append (coordenadas (car tab) l) 
                          (casas-vazias (cdr tab) (1+ l)))))))
+
+(defun remove-peca (p reserva)
+  (let ((predp #'(lambda (p e) (equal p e))))
+    (cond
+     ((or (null reserva) (null p)) NIL)
+     ((funcall predp p (car reserva)) (remove-peca p (cdr reserva)))
+     (t (cons (car reserva) (remove-peca p (cdr reserva)))))))
 
 (defun substituir-posicao (i p fila-tabuleiro)
   (cond
@@ -103,3 +106,48 @@
     (let ((novo-tabuleiro (copy-tree  tab)))
       (substituir-posicao c p (fila l (tabuleiro novo-tabuleiro)))
       (list (tabuleiro novo-tabuleiro) (remove-peca p (reserva novo-tabuleiro)))))))
+
+(defun operadores-quatro (estado-jogo)
+  (let* ((casas (casas-vazias (tabuleiro estado-jogo)))
+        (pecas (reserva estado-jogo)))
+    (apply #'append (mapcar #'(lambda (casa) (mapcar #'(lambda (peca)
+                                                         (jogada (car casa) (cadr casa) peca estado-jogo)) pecas)) casas))))
+
+; (operadore-quatro (p))
+
+(defun mostra-tabuleiro (tab)
+  (let ((seperator "_________________________________________________________________________________________________________________________"))
+    (format nil "~%TABULEIRO~%~A~%~A~%~A~%~A~%~A~%~A~%~%" 
+            seperator (mostra-linha 0 tab) (mostra-linha 1 tab) 
+            (mostra-linha 2 tab) (mostra-linha 3 tab) seperator)))
+
+(defun mostra-reserva (tab)
+  (remove nil (mapcar #'(lambda (a) (format t "~A~%" a)) tab)))
+
+(defun mostra-casas-vazias (tab)
+  (remove nil (mapcar #'(lambda (a) (format t "~A~%" a)) tab)))
+
+(defun mostra-lr (i l)
+  (let* ((li (linha i l)) (rows " ~A "))
+    (format nil rows li)
+    )
+  )
+
+(defun mostra-linha (i l)
+  (let* ((li (linha i l)) (rows "| ~A | ~A | ~A | ~A |"))
+    (format nil rows (extrai-n 0 li) (extrai-n 1 li) 
+            (extrai-n 2 li) (extrai-n 3 li))
+    )
+  )
+
+(defun linha (r tab)
+  (extrai-n r tab)
+  )
+
+(defun extrai-n (i l)
+  (cond
+   ((null l) nil)
+   ((= i 0) (car l))
+   (t (extrai-n (1- i) (cdr l)))
+   )
+  )

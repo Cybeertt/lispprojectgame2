@@ -22,7 +22,7 @@
       (format t "~%~%~%          Opcao -> "))
     (cond ((not (let ((escolha (read)))
                (cond 
-                ((and (numberp escolha) (< escolha 5) (> escolha 0)) (case escolha
+                ((and (numberp escolha) (< escolha 4) (> escolha 0)) (case escolha
                                                     (1 (progn (humcom (ler-limite) (primeiro-jogar))))
                                                     (2 (progn (comcom (ler-limite))))
                                                     (3 (progn (format t "~%~%~%          PROGRAMA TERMINADO") ))))
@@ -66,10 +66,32 @@
             (exibir-tab (cdr tab)))))
 
 (defun ler-jogada (coord pecas)
-  (format t "Coordenadas: ~a: " coord)
-  (format t "Pecas: ~a: " pecas))
-
-  
+  (format t "Coordenadas: ")
+  (terpri)
+  (format t "~a " (mostra-casas-vazias coord))
+  (terpri)
+  (terpri)
+  (format t "Pecas: ")
+  (terpri)
+  (format t "~a " (mostra-reserva pecas))
+  (terpri)
+  (terpri)
+  (format t "Escreva as coordenadas e o numero da posicao da peca: ")
+  (terpri)
+  (let ((x (read))
+        (y (read))
+        (csize (length coord))
+        (size (length pecas)))
+    (cond
+      ((and (> y 0) (<= y size) (> x 0) (<= x csize)) (let ((p (nth (1- y) pecas))
+                                                            (c (nth (1- x) coord)))
+                                  (cond
+                                   ((and (null (position c coord :test #'equal)) (null (position p pecas :test #'equal)))
+                                    (format t "Jogada Invalida")
+                                     (terpri)
+                                     (ler-jogada coord pecas))
+                                   (t (list (car c) (cadr c) p)))))
+      (t (format t "Jogada Invalida") (terpri) (ler-jogada coord pecas)))))
   
 
 (defun exibir-comeco-tab (tab)

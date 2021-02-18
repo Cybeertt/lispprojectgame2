@@ -34,71 +34,45 @@
 
 
         (escreve-log jogada-atualizada (get-play-time-milisecs play-start-time))
-        jogada-atualizada
-      )
+        jogada-atualizada)
       (t *tabuleiro))))|#
+
+(defun humano-quatro (jogo)
+  (let* ((joga (jogada (car jogo) (cadr jogo) (car (cddr jogo)) *tabuleiro))
+        (tab-atualiza-jogada joga))
+    (cond
+     ((and (null (car jogo)) (null (cadr jogo)) (null (cddr jogo))) (setf tab-atualiza-jogada *tabuleiro))
+     (t tab-atualiza-jogada))
+    (format t "Jogada efetuada por jogador ~a" *jogador)
+    tab-atualiza-jogada))
 
 #|
 (defun comcom (tempo)
     (reiniciar)
-
     (exibir-tab *tabuleiro)
-    
-    (loop while (or (not (no-solucaop *tabuleiro *jogador)) (not (no-solucaop *tabuleiro (outro-jogador *jogador))) (not (null (casas-vazias *tabuleiro))))
-      do
-
+    (loop while (or (and (not (null (operadores-quatro *tabuleiro *jogador))) (not (no-solucaop *tabuleiro *jogador))) (and (not (null (operadores-quatro *tabuleiro (outro-jogador *jogador)))) (not (no-solucaop *tabuleiro (outro-jogador *jogador))))) 
+          do
       (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
-      (setf *jogador (outro-jogador *jogador))))
+      (setf *jogador (outro-jogador *jogador))))|#
 
 (defun humcom (tempo &optional (j1 1))
   (reiniciar)
-
   (setf *jogador j1)
   (exibir-tab *tabuleiro)
-  (loop while (or (not (no-solucaop *tabuleiro *jogador)) (not (no-solucaop *tabuleiro (outro-jogador *jogador))) (not (null (casas-vazias *tabuleiro))))
-  (cond
-   ((= j1 1)
-    (let* ((jog-dis (casas-vazias (tabuleiro(*tabuleiro))))
-           (pecas (reserva(*tabuleiro))))
-      (cond
-       ((quatro-linha-p *tabuleiro) (exibir-tab *tabuleiro))
-       (t (let ((jogada (ler-jogada jog-dis pecas))) 
-            (setf *tabuleiro (jogada-humana (car jogada) (cadr jogada) (caddr jogada) *jogador)))))
-
-    (terpri)
-    (exibir-tab *tabuleiro)))
-   (t (setf *tabuleiro (jogar *tabuleiro tempo))))
-
-  ((equal *player -1)
-            (let* (
-              (moves (generate-moves *board *player))
-              (moves-avaliable (values-to-chess moves *board))
-            )
-
+  (loop while (or (not (null (reserva *tabuleiro))) (not (null (no-solucaop (tabuleiro *tabuleiro)))))
+        do
+        (cond
+         ((= *jogador 1)
+          (let* ((pecas (reserva *tabuleiro))
+                 (casas (casas-vazias (tabuleiro *tabuleiro))))
+            
             (cond
-            ((null moves-avaliable)
-            ;;adicionar tempo da jogada do humano?????
-              (setf *board (human-play (read-play (values-to-chess (car *board) *board)))))
-            (t (setf *board (human-play (read-play moves-avaliable))))
-            )
-          )
-
-          (terpri)
-          (display-board *board)
-        )
-        (t (setf *board (jogar *board time)))
-      )
-
-(setf *jogador (outro-jogador *jogador))))|#
-
-(defun jogada (l c p tab)
-  (cond
-   ((not (casa-vaziap l c (tabuleiro tab))) nil)
-   (t 
-    (let ((novo-tabuleiro (copy-tree  tab)))
-      (substituir-posicao c p (fila l (tabuleiro novo-tabuleiro)))
-      (list (tabuleiro novo-tabuleiro) (remove-peca p (reserva novo-tabuleiro)))))))
-
+             ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
+             (t (setf *tabuleiro (humano-quatro (ler-jogada casas pecas))) 
+            (setf *jogador (outro-jogador *jogador)) (exibir-tab *tabuleiro))); (humcom tempo (outro-jogador *jogador)))
+            ))
+         (t (setf *tabuleiro (jogar-quatro *tabuleiro tempo))))
+        (setf *jogador (outro-jogador *jogador))))
 
 
 (defun reiniciar ()
@@ -135,10 +109,7 @@
     (cond ((null no) nil)
 	  (t (list x (no-alpha no) (no-beta no) (1+ (no-profundidade-alphabeta no)) no))))
 
-(defun operadores-quatro (estado-jogo)
-  (let* ((casas (casas-vazias (tabuleiro estado-jogo)))
-        (pecas (reserva estado-jogo)))
-    (apply #'append (mapcar #'(lambda (casa) (mapcar #'(lambda (peca) (jogada (car casa) (cadr casa) peca estado-jogo)) pecas)) casas))))
+
 
 
 (defun ab (no profundidade jogador)
@@ -210,7 +181,7 @@
      (t (reduce #'(lambda (&optional a b) (or a b)) (apply #'mapcar #'eq-list linha))))))
 
 (defun no-solucaop (no)
-  (if (null no) nil (quatro-linha-p (tabuleiro-conteudo no))))
+  (if (null no) nil (quatro-linha-p (tabuleiro no))))
 
 (defun avaliar-no (no jogador)
   (labels ((contagem (lista pred predf)
@@ -290,7 +261,6 @@
 ;; tabuleiro teste
 (defun p ()
 '(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) -136000 136000 0 NIL))
-
 )
 
 #|
