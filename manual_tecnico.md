@@ -835,24 +835,24 @@ Reinicia um jogo no modo Humano versus PC, admitindo um determinado limite tempo
 ; funcao
 (defun humcom (tempo &optional (j1 1))
   (reiniciar)
-
   (setf *jogador j1)
   (exibir-tab *tabuleiro)
-
-  (cond
-   ((= j1 1)
-    (let* ((jog-dis (casas-vazias (tabuleiro(*tabuleiro))))
-           (pecas (reserva(*tabuleiro))))
-      (cond
-       ((quatro-linha-p *tabuleiro) (exibir-tab *tabuleiro))
-       (t (let ((jogada (ler-jogada jog-dis pecas))) 
-            (setf *tabuleiro (jogada-humana (car jogada) (cadr jogada) (caddr jogada) *jogador)))))
-
-    (terpri)
-    (exibir-tab *tabuleiro))
-   (t (setf *tabuleiro (jogar *tabuleiro tempo)))))
-
-(setf *jogador (outro-jogador *jogador)))
+  (loop while (not (null (casas-vazias (tabuleiro *tabuleiro))))
+        do
+        (cond
+         ((= *jogador 1)
+          (let* ((pecas (reserva *tabuleiro))
+                 (casas (casas-vazias (tabuleiro *tabuleiro))))
+            
+            (cond
+             ((no-solucaop *tabuleiro) (exibir-tab *tabuleiro) (terpri)
+             (format t "O vencedor: jogador ~a " (outro-jogador *jogador)) (menu-principal))
+             ((and (null pecas) (null casas)) (exibir-tab *tabuleiro) (terpri) (format t "Empate") (menu-principal))
+             (t (setf *tabuleiro (humano-quatro (ler-jogada casas pecas))) 
+            (setf *jogador (outro-jogador *jogador)) (exibir-tab *tabuleiro))); (humcom tempo (outro-jogador *jogador)))
+            ))
+         (t nil));(setf *tabuleiro (jogar-quatro *tabuleiro tempo))))
+        (setf *jogador (outro-jogador *jogador))))
 ```
 
 #### <a nome="f-jogada">Jogada</a>
@@ -1251,7 +1251,7 @@ Esta constante permite encontrar um ficheiro independentemente do tipo de sistem
 (defvar *base-pathname* (or *load-truename* *compile-file-truename*))
 ```
 
-#### <a name="f-proj-asset-path">Asset-Path</a>
+#### <a name="f-proj-asset-path">Caminho</a>
 Determina o caminho de um ficheiro independentemente de um sistema operativo.
 
 **Parâmetros**
@@ -1260,7 +1260,7 @@ Determina o caminho de um ficheiro independentemente de um sistema operativo.
 
 ```lisp
 ; funcao
-(defun asset-path (file)
+(defun caminho (file)
   (merge-pathnames file *base-pathname*))
 ```
 
@@ -1270,8 +1270,8 @@ Carrega ficheiros necessários para o funcionamento do programa.
 ```lisp
 ; carrega ficheiros
 (progn
-  (load (asset-path "jogo.lisp"))
-  (load (asset-path "algoritmo.lisp")))
+  (load (caminho "jogo.lisp"))
+  (load (caminho "algoritmo.lisp")))
 ```
 
 #### <a name="f-proj-menu-principal">Menu-Principal</a>
@@ -1412,8 +1412,8 @@ Imprime na consola o tabuleiro.
     (cond
         ((null tab) '())
         (t
-            (write-line (write-to-string (car tab)))
-            (exibir-tab (cdr tab)))))
+            (write-line (write-to-string (mostra-tabuleiro (car tab))))
+            (write-line (write-to-string (mostra-reserva (reserva tab)))))))
 ```
 
 #### <a name="f-exibir-tab">Exibir-Tab</a>
@@ -1428,8 +1428,32 @@ Imprime na consola as coordenadas e as peças disponíveis para efetuar uma joga
 ```lisp
 ; funcao
 (defun ler-jogada (coord pecas)
-  (format t "Coordenadas: ~a: " coord)
-  (format t "Pecas: ~a: " pecas))
+  (format t "Coordenadas: ")
+  (terpri)
+  (format t "~a " (mostra-casas-vazias coord))
+  (terpri)
+  (terpri)
+  (format t "Pecas: ")
+  (terpri)
+  (format t "~a " (mostra-reserva pecas))
+  (terpri)
+  (terpri)
+  (format t "Escreva as coordenadas e o numero da posicao da peca: ")
+  (terpri)
+  (let ((x (read))
+        (y (read))
+        (csize (length coord))
+        (size (length pecas)))
+    (cond
+      ((and (> y 0) (<= y size) (> x 0) (<= x csize)) (let ((p (nth (1- y) pecas))
+                                                            (c (nth (1- x) coord)))
+                                  (cond
+                                   ((and (null (position c coord :test #'equal)) (null (position p pecas :test #'equal)))
+                                    (format t "Jogada Invalida")
+                                     (terpri)
+                                     (ler-jogada coord pecas))
+                                   (t (list (car c) (cadr c) p)))))
+      (t (format t "Jogada Invalida") (terpri) (ler-jogada coord pecas)))))
 ```
 
 #### <a name="f-exibir-comeco-tab">Exibir-Comeco-Tab</a>
