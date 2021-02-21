@@ -7,10 +7,6 @@
 (defun print-hash-entry (key value)
     (format t "The value associated with the key ~a is ~a~%" key value))
 
-(defun no-estado (no)
-  (car no))
-
-
 (let (
   (*jogador 1)
   (*tabuleiro (tab)))
@@ -83,17 +79,17 @@
   (* -1 j))
 
 
-(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (alfa (- (limit-max-pontuacao (pontuacao)))) (beta (limit-max-pontuacao (pontuacao))))
-  (list estado alfa beta profundidade pai))
+(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) &aux (value (avaliar-no (list estado 0 profundidade pai) 1)))
+  (list estado value profundidade pai))
 
 ;Estado Tabuleiro sem reserva
 (defun tabuleiro-conteudo (no)
   (caar no))
 
-(defun no-pai (no) (car (cddddr no)))
-(defun no-alpha (no) (cadr no))
-(defun no-beta (no) (caddr no))
-(defun no-profundidade-alphabeta (no) (cadddr no))
+(defun no-estado (no) (car no))
+(defun no-value (no) (cadr no)) ; seguir como nos exercicios alphabeta corte, em que o valor esta no no
+(defun no-profundidade-alphabeta (no) (caddr no))
+(defun no-pai (no) (cadddr no))
 
 (defun sucessores-quatro (no operadoresf &optional (max-prof 0))
   (cond 
@@ -101,18 +97,16 @@
    ((>= (no-profundidade-alphabeta no) max-prof) nil)
    ((no-solucaop no) nil)
    (t (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
-      (cond 
-       ((null coordenadas) NIL)
-       (t (remove nil (mapcar #'(lambda (estado) (novo-sucessor no estado)) (funcall operadoresf (no-estado no))))))))))
+        (cond 
+         ((null coordenadas) NIL)
+         (t (remove nil (mapcar #'(lambda (estado) (cond ((null estado) nil) (t (novo-sucessor no estado)))) (funcall operadoresf (no-estado no))))))))))
 
-(defun novo-sucessor (no x)
-    (cond ((null no) nil)
-	  (t (list x (no-alpha no) (no-beta no) (1+ (no-profundidade-alphabeta no)) no))))
+(defun novo-sucessor (no estado)
+  (cond
+   ((null no) nil)
+   (t (cria-no-alphabeta estado (1+ (no-profundidade-alphabeta no)) no))))
 
-
-
-
-(defun ab (no profundidade jogador)
+#|(defun ab (no profundidade jogador)
   (cond
    ((or (zerop profundidade) (null (sucessores-quatro no #'operadores-quatro profundidade)))
     (avaliar-no no jogador))
@@ -138,7 +132,65 @@
             (cond 
              ((no-solucaop d) (setf value-min value-aux) (setf beta beta-aux) (return))
              ((<= beta-aux (no-alpha no)) (return))
-             (t (setf value-min value-aux) (setf beta beta-aux))))) value-min))))
+             (t (setf value-min value-aux) (setf beta beta-aux))))) value-min))))|#
+
+#|START Alphabeta functions|#
+#|1. Alphabeta que seria a fun��o principal que tens com as condi��es de paragem e 
+a verifica��o se o jogador � max ou min.|#
+; CL-USER > (alphabeta (p) 3 1)
+; -43
+; CL-USER > (alphabeta (p) 3 1)
+; 43
+(defun alphabeta (no profundidade jogador &optional (alpha most-negative-fixnum) (beta most-positive-fixnum))
+  (cond
+   ; no solucao
+   ((no-solucaop no)
+    (* (no-value no) jogador))
+   ; condicoes de paragem: profundidade zero or no ternimal
+   ((or (zerop profundidade) (null (sucessores-quatro no #'operadores-quatro profundidade)))
+    (* (no-value no) jogador)) ; valor heuristico calculado no mas com sinais
+   ; max
+   ((> jogador 0)
+    (let* ((value-alpha most-negative-fixnum)
+           (sucessores (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
+           (value-alpha (alphabeta-max no profundidade (outro-jogador jogador) sucessores alpha beta value-alpha)))
+                   value-alpha))
+    ; min
+   (t
+    (let* ((value-beta most-positive-fixnum)
+           (sucessores (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
+           (value-beta (alphabeta-min no profundidade (outro-jogador jogador) sucessores alpha beta value-beta)))
+           value-beta))))
+
+#|2. Alphabeta-max que seria uma fun��o auxiliar que iria ser chamada sempre que o jogador � 
+max e n�o parou nas condi��es de paragem. Antes de chamar essa fun��o eram gerados os sucessores 
+para que essa fun��o recursivamente chamasse o Alphabeta para cada sucessor.|#
+(defun alphabeta-max (no-pai profundidade adversario &optional (sucessores NIL) (alpha most-negative-fixnum) (beta most-positive-fixnum) (value-alpha most-negative-fixnum) &aux (sucessor (car sucessores)))
+  (cond
+   ((null sucessores) value-alpha) ; sem sucessores
+   (t
+    ; algoritmo alphabeta
+    (let* ((value (max value-alpha (alphabeta sucessor (- (no-profundidade-alphabeta no-pai) 1) adversario alpha beta)))
+           (a (max alpha value)))
+      (cond
+       ((>= a beta) value-alpha) ; condicao de corte: alpha >= beta
+       (t (alphabeta-max no-pai profundidade adversario (cdr sucessores) a beta value))))))) ; recursividade
+
+#|3. Alphabeta-min que seria uma fun��o auxiliar que iria ser chamada sempre que o jogador � min 
+e nao parou nas condicoes de paragem. Antes de chamar essa fun��o eram gerados os sucessores para 
+que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
+(defun alphabeta-min (no-pai profundidade adversario &optional (sucessores NIL) (alpha most-negative-fixnum) (beta most-positive-fixnum) (value-beta most-positive-fixnum) &aux (sucessor (car sucessores)))
+  (cond
+   ((null sucessores) value-beta) ; sem sucessores
+   (t
+    ; algoritmo alphabeta
+    (let* ((value (min value-beta (alphabeta sucessor (- (no-profundidade-alphabeta no-pai) 1) adversario alpha beta)))
+           (b (min beta value)))
+      (cond
+       ((<= b alpha) value-beta) ; condicao de corte: beta <= alpha
+       (t (alphabeta-min no-pai profundidade adversario (cdr sucessores) alpha b value))))))) ; recursividade
+
+#|END Alphabeta functions|#
 
 (defun quatro-linha-p (tabuleiro)
   (cond
@@ -208,18 +260,6 @@
                                       ((= x 1) 1) ; linha com 1 peca e 3 vazios
                                       (t 0))) #'(lambda (y) (> y 0)))))))
 
-;; no: alphabeta
-;; j: {-1, 1}
-(defun sumalpha (no j)
-  (cond
-   ((null no) nil)
-   (t (+ (no-alpha no) (* j (avaliar-no no j))))))
-
-(defun subtractbeta (no j)
-  (cond
-   ((null no) nil)
-   (t (- (no-beta no) (* j (avaliar-no no j))))))
-
 ;; tabuleiro com pontuacao
 (defun pontuacao ()
   '((1000 2000 3000 4000) (5000 6000 7000 8000) (9000 10000 11000 12000) (13000 14000 15000 16000)))
@@ -236,13 +276,6 @@
               ((null tab) nil)
               (t (append (coordenadas (car tab) l) 
                          (casas-n-vazias (cdr tab) (1+ l)))))))
-
-#|SUBSTITUIR
-(defun substituir-posicao (i p fila-tabuleiro)
-  (cond
-   ((or (null p) (null fila-tabuleiro)) NIL)
-   (t (setf (nth i fila-tabuleiro) p))))
-|#
 
 (defun nova-pontuacao (tabuleiro)
   (let ((tabuleiro-pontuacao (copy-tree (pontuacao))) (ocupadas (casas-n-vazias tabuleiro)))
