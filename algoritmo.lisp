@@ -135,8 +135,8 @@
              (t (setf value-min value-aux) (setf beta beta-aux))))) value-min))))|#
 
 #|START Alphabeta functions|#
-#|1. Alphabeta que seria a fun��o principal que tens com as condi��es de paragem e 
-a verifica��o se o jogador � max ou min.|#
+#|1. Alphabeta que seria a funcao principal que tens com as condicoes de paragem e 
+a verificacao se o jogador e max ou min.|#
 ; CL-USER > (alphabeta (p) 3 1)
 ; -43
 ; CL-USER > (alphabeta (p) 3 1)
@@ -162,9 +162,9 @@ a verifica��o se o jogador � max ou min.|#
            (value-beta (alphabeta-min no profundidade (outro-jogador jogador) sucessores alpha beta value-beta)))
            value-beta))))
 
-#|2. Alphabeta-max que seria uma fun��o auxiliar que iria ser chamada sempre que o jogador � 
-max e n�o parou nas condi��es de paragem. Antes de chamar essa fun��o eram gerados os sucessores 
-para que essa fun��o recursivamente chamasse o Alphabeta para cada sucessor.|#
+#|2. Alphabeta-max que seria uma funcao auxiliar que iria ser chamada sempre que o jogador e 
+max e nao parou nas condicoes de paragem. Antes de chamar essa funcao eram gerados os sucessores 
+para que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
 (defun alphabeta-max (no-pai profundidade adversario &optional (sucessores NIL) (alpha most-negative-fixnum) (beta most-positive-fixnum) (value-alpha most-negative-fixnum) &aux (sucessor (car sucessores)))
   (cond
    ((null sucessores) value-alpha) ; sem sucessores
@@ -176,8 +176,8 @@ para que essa fun��o recursivamente chamasse o Alphabeta para cada sucessor.
        ((>= a beta) value-alpha) ; condicao de corte: alpha >= beta
        (t (alphabeta-max no-pai profundidade adversario (cdr sucessores) a beta value))))))) ; recursividade
 
-#|3. Alphabeta-min que seria uma fun��o auxiliar que iria ser chamada sempre que o jogador � min 
-e nao parou nas condicoes de paragem. Antes de chamar essa fun��o eram gerados os sucessores para 
+#|3. Alphabeta-min que seria uma funcao auxiliar que iria ser chamada sempre que o jogador e min 
+e nao parou nas condicoes de paragem. Antes de chamar essa funcao eram gerados os sucessores para 
 que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
 (defun alphabeta-min (no-pai profundidade adversario &optional (sucessores NIL) (alpha most-negative-fixnum) (beta most-positive-fixnum) (value-beta most-positive-fixnum) &aux (sucessor (car sucessores)))
   (cond
@@ -293,7 +293,7 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
 
 ;; tabuleiro teste
 (defun p ()
-'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) -136000 136000 0 NIL))
+'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) 44 0 NIL))
 )
 
 #|
