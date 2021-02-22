@@ -1,6 +1,7 @@
 (defvar *cortes-alfa* 0)
 (defvar *cortes-beta* 0)
 (defvar *nos-analisados* 0)
+(defvar *jogar* 0)
 
 (defparameter *dispersao* (make-hash-table))
 
@@ -11,65 +12,56 @@
   (*jogador 1)
   (*tabuleiro (tab)))
 
-#|
-(defun jogar-quatro (tab tempo)
-    (let* (
-      (op (ab (tab 1 *jogador)))
-      
-      )
-
+(defun jogar-quatro (tab tempo profundidade)
+  (setf *cortes-alfa* 0)
+  (setf *cortes-beta* 0)
+  (setf *nos-analisados* 0)
+  (let* (;(play-start-time (get-internal-real-time))
+         (op (alphabeta tab profundidade *jogador))
+         (tab-atual (tabuleiro-conteudo tab)))
     (cond
-      ((and (null (first indexes-player)) (null (second indexes-player)))
-        (setf jogada-atualizada (jogada linha coluna peca *tabuleiro))
-      )
-    )
-
-    (cond
-      ((not (null jogada-atualizada))
-        (display-computer-move *player (position-indexes-to-chess indexes-move) board-with-updated-player-position)
-
-
-        (escreve-log jogada-atualizada (get-play-time-milisecs play-start-time))
-        jogada-atualizada)
-      (t *tabuleiro))))|#
+     ((null op) tab-atual)
+     ((not (null op)) (setf *tabuleiro (no-estado *jogar*))
+      (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados*)
+     (no-estado *jogar*)) 
+     (t tab))))
 
 (defun humano-quatro (jogo)
-  (let* ((joga (jogada (car jogo) (cadr jogo) (car (cddr jogo)) *tabuleiro))
-        (tab-atualiza-jogada joga))
+  (let* ((joga (jogada (car jogo) (cadr jogo) (car (cddr jogo)) *tabuleiro)))
     (cond
-     ((and (null (car jogo)) (null (cadr jogo)) (null (cddr jogo))) (setf tab-atualiza-jogada *tabuleiro))
-     (t tab-atualiza-jogada))
-    (format t "Jogada efetuada por jogador ~a" *jogador)
-    tab-atualiza-jogada))
+     ((null jogo) (setf joga *tabuleiro))
+     (t (progn (format t "Jogada efetuada por jogador ~a" *jogador)))) joga))
 
-#|
-(defun comcom (tempo)
+
+(defun comcom (tempo profundidade)
     (reiniciar)
     (exibir-tab *tabuleiro)
-    (loop while (or (and (not (null (operadores-quatro *tabuleiro *jogador))) (not (no-solucaop *tabuleiro *jogador))) (and (not (null (operadores-quatro *tabuleiro (outro-jogador *jogador)))) (not (no-solucaop *tabuleiro (outro-jogador *jogador))))) 
+    (loop while (not (null (quatro-linha-p *tabuleiro))) 
           do
-      (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
-      (setf *jogador (outro-jogador *jogador))))|#
+          (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))
+      (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro))
 
-(defun humcom (tempo &optional (j1 1))
+;jogada humana
+;ganhar funcionar
+;pára num certo numero de jogadas
+(defun humcom (tempo profundidade &optional (j1 1))
   (reiniciar)
   (setf *jogador j1)
-  (exibir-tab *tabuleiro)
+  (escreve-log *tabuleiro 0 tempo *cortes-alfa* *cortes-beta* *nos-analisados*)
   (loop while (or (not (null (reserva *tabuleiro))) (not (null (no-solucaop (tabuleiro *tabuleiro)))))
         do
         (cond
          ((= *jogador 1)
-          (let* ((pecas (reserva *tabuleiro))
-                 (casas (casas-vazias (tabuleiro *tabuleiro))))
-            
+          (exibir-tab *tabuleiro)
+          (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
+                 (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro)) 0))
+                 (ler (ler-jogada casas pecas)))
             (cond
              ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
-             (t (setf *tabuleiro (humano-quatro (ler-jogada casas pecas))) 
-            (setf *jogador (outro-jogador *jogador)) (exibir-tab *tabuleiro))); (humcom tempo (outro-jogador *jogador)))
-            ))
-         (t (setf *tabuleiro (jogar-quatro *tabuleiro tempo))))
-        (setf *jogador (outro-jogador *jogador))))
-
+             (t (setf *tabuleiro (humano-quatro ler)) (escreve-log *tabuleiro *jogador tempo *cortes-alfa* *cortes-beta* *nos-analisados*)))
+            ) (terpri) (exibir-tab *tabuleiro))
+         (t (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))))
+        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro))
 
 (defun reiniciar ()
     (setf *tabuleiro (tab))
@@ -79,8 +71,8 @@
   (* -1 j))
 
 
-(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) &aux (value (avaliar-no (list estado 0 profundidade pai) 1)))
-  (list estado value profundidade pai))
+(defun cria-no-alphabeta (estado &optional (profundidade 0) (j1 *jogador) (pai NIL) &aux (value (avaliar-no (list estado 0 profundidade pai) 1)))
+  (list estado value profundidade j1 pai))
 
 ;Estado Tabuleiro sem reserva
 (defun tabuleiro-conteudo (no)
@@ -152,15 +144,15 @@ a verificaï¿½ï¿½o se o jogador ï¿½ max ou min.|#
    ; max
    ((> jogador 0)
     (let* ((value-alpha most-negative-fixnum)
-           (sucessores (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
-           (value-alpha (alphabeta-max no profundidade (outro-jogador jogador) sucessores alpha beta value-alpha)))
-                   value-alpha))
+           (sucessores (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade))))
+           ;(value-alpha (alphabeta-max no profundidade (outro-jogador jogador) sucessores alpha beta value-alpha)))
+           (alphabeta-max no profundidade (outro-jogador jogador) sucessores alpha beta value-alpha)))
     ; min
    (t
     (let* ((value-beta most-positive-fixnum)
-           (sucessores (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
-           (value-beta (alphabeta-min no profundidade (outro-jogador jogador) sucessores alpha beta value-beta)))
-           value-beta))))
+           (sucessores (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade))))
+           ;(value-beta (alphabeta-min no profundidade (outro-jogador jogador) sucessores alpha beta value-beta)))
+           (alphabeta-min no profundidade (outro-jogador jogador) sucessores alpha beta value-beta)))))
 
 #|2. Alphabeta-max que seria uma funï¿½ï¿½o auxiliar que iria ser chamada sempre que o jogador ï¿½ 
 max e nï¿½o parou nas condiï¿½ï¿½es de paragem. Antes de chamar essa funï¿½ï¿½o eram gerados os sucessores 
@@ -170,11 +162,12 @@ para que essa funï¿½ï¿½o recursivamente chamasse o Alphabeta para cada sucessor.
    ((null sucessores) value-alpha) ; sem sucessores
    (t
     ; algoritmo alphabeta
-    (let* ((value (max value-alpha (alphabeta sucessor (- (no-profundidade-alphabeta no-pai) 1) adversario alpha beta)))
+    (let* ((value (max value-alpha (alphabeta sucessor (- (no-profundidade-alphabeta no-pai) 1)  adversario alpha beta)))
            (a (max alpha value)))
       (cond
-       ((>= a beta) value-alpha) ; condicao de corte: alpha >= beta
-       (t (alphabeta-max no-pai profundidade adversario (cdr sucessores) a beta value))))))) ; recursividade
+       ((>= a beta) (setf *cortes-alfa* (+ *cortes-alfa* 1)) value-alpha) ; condicao de corte: alpha >= beta
+       (t (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)) 
+          (max a (alphabeta-max no-pai profundidade adversario (cdr sucessores) a beta value)))))))) ; recursividade
 
 #|3. Alphabeta-min que seria uma funï¿½ï¿½o auxiliar que iria ser chamada sempre que o jogador ï¿½ min 
 e nao parou nas condicoes de paragem. Antes de chamar essa funï¿½ï¿½o eram gerados os sucessores para 
@@ -187,8 +180,9 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
     (let* ((value (min value-beta (alphabeta sucessor (- (no-profundidade-alphabeta no-pai) 1) adversario alpha beta)))
            (b (min beta value)))
       (cond
-       ((<= b alpha) value-beta) ; condicao de corte: beta <= alpha
-       (t (alphabeta-min no-pai profundidade adversario (cdr sucessores) alpha b value))))))) ; recursividade
+       ((<= b alpha) (setf *cortes-beta* (+ *cortes-beta* 1)) value-beta) ; condicao de corte: beta <= alpha
+       (t (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)) 
+          (min b (alphabeta-min no-pai profundidade adversario (cdr sucessores) alpha b value)))))))) ; recursividade
 
 #|END Alphabeta functions|#
 
@@ -233,7 +227,7 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
      (t (reduce #'(lambda (&optional a b) (or a b)) (apply #'mapcar #'eq-list linha))))))
 
 (defun no-solucaop (no)
-  (if (null no) nil (quatro-linha-p (tabuleiro no))))
+  (if (null no) nil (quatro-linha-p (tabuleiro (no-estado no)))))
 
 (defun avaliar-no (no jogador)
   (labels ((contagem (lista pred predf)
@@ -265,7 +259,7 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
   '((1000 2000 3000 4000) (5000 6000 7000 8000) (9000 10000 11000 12000) (13000 14000 15000 16000)))
 
 ;; pontuacao, remover da coordenada o valor
-(defun casas-n-vazias (tab &optional (l 0))
+(defun casas-n-vazias (tab profundidade &optional (l 0))
   (labels (( coordenadas (fila l &optional (c 0))
              (cond
               ((null fila) nil)
@@ -273,7 +267,8 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
                (cons (list l c) (coordenadas (cdr fila) l (1+ c))))
               (t (coordenadas (cdr fila) l (1+ c))))))
              (cond 
-              ((null tab) nil)
+              ((not (null (gethash (list tab *jogador) *dispersao*))) 
+               (cria-no-alphabeta (gethash (list tab *jogador) *dispersao*) (1+ profundidade) *jogador nil))
               (t (append (coordenadas (car tab) l) 
                          (casas-n-vazias (cdr tab) (1+ l)))))))
 
@@ -293,7 +288,7 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
 
 ;; tabuleiro teste
 (defun p ()
-'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) -136000 136000 0 NIL))
+'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) 44 0 NIL))
 )
 
 #|

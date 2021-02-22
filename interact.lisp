@@ -6,7 +6,7 @@
   (load (caminho "jogo.lisp"))
   (load (caminho "algoritmo.lisp")))
 
-(defun menu-principal ()
+(defun startup ()
   (loop
     (progn
       (format t "~%~%~%~%~%~%~%~%~%")
@@ -58,12 +58,19 @@
       )
     (read)))
 
+(defun ler-profundidade ()
+  (progn
+    (progn
+      (format t "   ~%------ESCREVA A PROFUNDIDADE MAXIMA------")
+      (terpri)
+      )
+    (read)))
+
 (defun exibir-tab (tab)
     (cond
         ((null tab) '())
         (t
-            (write-line (write-to-string (car tab)))
-            (exibir-tab (cdr tab)))))
+            (write-line (write-to-string (mostra-tabuleiro (tabuleiro tab)))))))
 
 (defun ler-jogada (coord pecas)
   (format t "Coordenadas: ")
@@ -113,20 +120,27 @@
   )
 
 
-(defun escreve-log (tab tempo)
+(defun escreve-log (tab j tempo alfa beta nos-analisados)
   "Writes the statistics file with the solution and it's statistic data, for breadth first and depth first algorithms"
 
  
-         (with-open-file (file (caminho "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
-           (progn 
-             (terpri)
-                (format file "~%~t------------:JOGADA------------")
-             (terpri)
-                (format file "~%~t----:  Tempo do jogo: ~a Milisegundos" tempo)  
-             (terpri)
-             (terpri)
-                (format file "~%~t----:  Tabuleiro Atual:")
-             (terpri)
-                (Imprimir tab file)
-             )))
+  (with-open-file (file (caminho "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
+    (progn 
+      (terpri)
+      (format file "~%~t------------:JOGADA------------")
+      (terpri)
+      (format file "~%~t----:  Tempo do jogo: ~a Milisegundos" tempo)  
+      (terpri)
+      (format file "~%~t----:  Jogador: ~a " j)  
+      (terpri)
+      (format file "~%~t----:  Cortes Alfa: ~a" alfa)
+      (terpri)
+      (format file "~%~t----:  Cortes Beta: ~a" beta)
+      (terpri)
+      (format file "~%~t----:  Numero de nos: ~a" nos-analisados)
+      (terpri)
+      (terpri)
+      (format file "~%~t----:  Tabuleiro Atual:")
+      (terpri)
+      (Imprimir tab file))))
 
