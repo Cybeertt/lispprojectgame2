@@ -1,6 +1,8 @@
 (defvar *cortes-alfa* 0)
 (defvar *cortes-beta* 0)
 (defvar *nos-analisados* 0)
+(defvar *nos-cortados*   0 )
+(defvar *nos-expandidos* 0 )
 (defvar *jogar* NIL)
 
 (defparameter *dispersao* (make-hash-table))
@@ -23,7 +25,7 @@
  (alphabeta tab profundidade *jogador)
 (princ *jogar*)
     (setf *tabuleiro (no-estado *jogar*))
-    (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados*)
+    (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
     (no-estado *jogar*));)
 
 (defun humano-quatro (jogo)
@@ -41,7 +43,7 @@
     (loop while (not (null (quatro-linha-p *tabuleiro))) 
           do
           (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))
-      (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro))
+      (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (startup))
 
 ;jogada humana
 ;ganhar funcionar
@@ -49,10 +51,11 @@
 (defun humcom (tempo profundidade &optional (j1 1))
   (reiniciar)
   (setf *jogador j1)
-  (escreve-log *tabuleiro 0 tempo *cortes-alfa* *cortes-beta* *nos-analisados*)
-  (loop while (or (not (quatro-linha-p *tabuleiro)) (not (null (reserva *tabuleiro))))
+  (escreve-log *tabuleiro 0 (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+  (loop while (not (null (quatro-linha-p *tabuleiro))) ;(not (null (reserva *tabuleiro))))
         do
         (cond
+         ((no-solucaop (cria-no-alphabeta *tabuleiro)) (startup))
          ((= *jogador 1)
           (exibir-tab *tabuleiro)
 (princ "---HUM---")
@@ -61,15 +64,21 @@
                  (ler (ler-jogada casas pecas)))
             (cond
              ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
-             (t (setf *tabuleiro (humano-quatro ler)) (escreve-log *tabuleiro *jogador tempo *cortes-alfa* *cortes-beta* *nos-analisados*)
+             
+             (t (setf *tabuleiro (humano-quatro ler)) (escreve-log *tabuleiro *jogador (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
                 (terpri) (exibir-tab *tabuleiro)))
             ) )
          (t (princ "---COM---") (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))))
-        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro))
+        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (startup))
 
 (defun reiniciar ()
     (setf *tabuleiro (tab))
-    (setf *jogador 1))
+    (setf *jogador 1)
+    (setf *cortes-alfa* 0)
+    (setf *cortes-beta* 0)
+    (setf *nos-analisados* 0)
+    (setf *nos-cortados*   0 )
+    (setf *nos-expandidos* 0 ))
 
 (defun outro-jogador (j)
   (* -1 j))
@@ -119,12 +128,16 @@ a verificacao se o jogador e max ou min.|#
         (cond
          ; max
          ((> jogador 0); (sort-max sucessores)
-          (let ((sucessores-max (sort-max sucessores)))
-            (alphabeta-max no profundidade jogador sucessores-max alpha beta)))
+          (let* ((sucessores-max (sort-max sucessores))
+                (tamanho-max (length sucessores-max)))
+            (progn (setf *nos-expandidos* (+ *nos-expandidos* tamanho-max))
+            (alphabeta-max no profundidade jogador sucessores-max alpha beta))))
          ; min
          ;(sort-min sucessores)
-         (t (let ((sucessores-min (sort-min sucessores)))
-              (alphabeta-min no profundidade jogador sucessores-min alpha beta))
+         (t (let* ((sucessores-min (sort-min sucessores))
+                  (tamanho-min (length sucessores-min)))
+              (progn (setf *nos-expandidos* (+ *nos-expandidos* tamanho-min))
+              (alphabeta-min no profundidade jogador sucessores-min alpha beta)))
 ))))))
 
 #|2. Alphabeta-max que seria uma funcao auxiliar que iria ser chamada sempre que o jogador e 
@@ -138,7 +151,7 @@ para que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
     (let* ((value (max alpha (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) alpha beta)))
            (a (max alpha value)))
       (cond
-       ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1))) alpha) ; condicao de corte: alpha >= beta
+       ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) alpha) ; condicao de corte: alpha >= beta
        (t (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) 
           (max a (alphabeta-max no-pai profundidade jogador (cdr sucessores) a beta)))))))) ; recursividade
 
@@ -153,7 +166,7 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
     (let* ((value (min beta (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) alpha beta)))
            (b (min beta value)))
       (cond
-       ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1))) beta) ; condicao de corte: beta <= alpha
+       ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) beta) ; condicao de corte: beta <= alpha
        (t (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) 
           (min b (alphabeta-min no-pai profundidade jogador (cdr sucessores) alpha b)))))))) ; recursividade
 
