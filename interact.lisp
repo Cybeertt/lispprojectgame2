@@ -23,8 +23,8 @@
     (cond ((not (let ((escolha (read)))
                (cond 
                 ((and (numberp escolha) (< escolha 4) (> escolha 0)) (case escolha
-                                                    (1 (progn (humcom (ler-limite) (primeiro-jogar))))
-                                                    (2 (progn (comcom (ler-limite))))
+                                                    (1 (progn (humcom (ler-limite) (ler-profundidade) (primeiro-jogar))))
+                                                    (2 (progn (comcom (ler-limite) (ler-profundidade))))
                                                     (3 (progn (format t "~%~%~%          PROGRAMA TERMINADO") ))))
                 ( T (progn  (format t "~%          ESCOLHA INVALIDA~%~%          Option -> ")
                             (setf escolha (read))))))) 
