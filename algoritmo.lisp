@@ -119,12 +119,13 @@ a verificacao se o jogador e max ou min.|#
         (cond
          ; max
          ((> jogador 0); (sort-max sucessores)
-          (let ((sucessores-max (sort-max sucessores)))
-            (alphabeta-max no profundidade jogador sucessores-max alpha beta)))
+          ;(let ((sucessores-max (sort-max sucessores)))
+            (alphabeta-max no profundidade jogador sucessores alpha beta));)
          ; min
          ;(sort-min sucessores)
-         (t (let ((sucessores-min (sort-min sucessores)))
-              (alphabeta-min no profundidade jogador sucessores-min alpha beta))))))))
+         (t ;(let ((sucessores-min (sort-min sucessores)))
+              (alphabeta-min no profundidade jogador sucessores alpha beta);)
+))))))
 
 #|2. Alphabeta-max que seria uma funcao auxiliar que iria ser chamada sempre que o jogador e 
 max e nao parou nas condicoes de paragem. Antes de chamar essa funcao eram gerados os sucessores 
