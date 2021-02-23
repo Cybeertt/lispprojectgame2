@@ -134,7 +134,7 @@ para que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
    ((null sucessores) alpha) ; sem sucessores
    (t
     ; algoritmo alphabeta
-    (let* ((value (max alpha (alphabeta sucessor (- (no-profundidade-alphabeta no-pai) 1) (outro-jogador jogador) alpha beta)))
+    (let* ((value (max alpha (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) alpha beta)))
            (a (max alpha value)))
       (cond
        ((>= a beta) (setf *cortes-alfa* (+ *cortes-alfa* 1)) alpha) ; condicao de corte: alpha >= beta
@@ -149,7 +149,7 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
    ((null sucessores) beta) ; sem sucessores
    (t
     ; algoritmo alphabeta
-    (let* ((value (min beta (alphabeta sucessor (- (no-profundidade-alphabeta no-pai) 1) (outro-jogador jogador) alpha beta)))
+    (let* ((value (min beta (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) alpha beta)))
            (b (min beta value)))
       (cond
        ((<= b alpha) (setf *cortes-beta* (+ *cortes-beta* 1)) beta) ; condicao de corte: beta <= alpha
