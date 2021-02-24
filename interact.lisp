@@ -116,8 +116,9 @@
 (defun Imprimir (tab &optional (file-stream t))
   "lista o tabuleiro"
   (not (null (mapcar #'(lambda(l) 
-        (format file-stream "~%~t~t ~a" l)) tab)))
-  )
+        (format file-stream "~%~t~t ~a"  l)) (car tab))))
+  (not (null (mapcar #'(lambda(l) 
+        (format file-stream "~%~t~t ~a"  l)) (cdr tab)))))
  #| (cond 
    ((null tab) (format file-stream ""))
    ((tabuleiro-conteudo tab) (progn (Imprimir (tabuleiro-conteudo (car tab)) t) (format t "~%") (Imprimirard-file (tabuleiro-conteudo (cdr tab)) t)))

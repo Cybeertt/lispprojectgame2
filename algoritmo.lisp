@@ -21,25 +21,17 @@
   (setf *cortes-alfa* 0)
   (setf *cortes-beta* 0)
   (setf *nos-analisados* 0)
-  ;(let* (;(play-start-time (get-internal-real-time))
-         ;(op (alphabeta tab profundidade *jogador))
-         ;(tab-atual (tabuleiro (no-estado tab))))
-<<<<<<< HEAD
-  (alphabeta tab profundidade *jogador)
-  (princ profundidade)
+  (let ((temp (get-internal-real-time)))
+    (alphabeta tab profundidade *jogador tempo)
   (cond
-   ((zerop profundidade) (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) (exibir-tab *tabuleiro))
+   ((zerop profundidade) (escreve-log *tabuleiro *jogador (tempo-milisegundos temp) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) (exibir-tab *tabuleiro))
    ((= 1 (no-profundidade-alphabeta *jogar*)) (setf *tabuleiro (no-estado *jogar*)) (setf profundidade *p) (princ profundidade)
-      (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+      (escreve-log *tabuleiro *jogador (tempo-milisegundos temp) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
       (no-estado *jogar*) )
-   (t (setf *jogar* (no-pai *jogar*)) (jogar-quatro tab tempo (- profundidade 1)))))
-=======
- (alphabeta tab profundidade *jogador tempo)
-(princ *jogar*)
-    (setf *tabuleiro (no-estado *jogar*))
-    (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
-    (no-estado *jogar*) (exibir-tab *tabuleiro));)
->>>>>>> 4d19c4eaf9c8dbd1c55814497c09888060f5a939
+   (t (setf *jogar* (no-pai *jogar*)) (jogar-quatro tab tempo (- profundidade 1))))))
+
+ 
+
 
 (defun humano-quatro (jogo)
   (let ((joga (jogada (car jogo) (cadr jogo) (car (cddr jogo)) *tabuleiro)))
@@ -47,7 +39,7 @@
     (princ jogo)
     (cond
      ((null jogo) (setf joga *tabuleiro))
-     (t (format t "Jogada efetuada por jogador ~a" *jogador))) joga))
+     (t (format t "Jogada efetuada por jogador ~a" *jogador) (setf *tabuleiro joga)))))
 
 
 (defun comcom (tempo profundidade)
@@ -67,24 +59,21 @@
   (setf *jogador j1)
   (setf *p profundidade)
   (princ *p)
-  (exibir-comeco-tab *tabuleiro)
-  (escreve-log *tabuleiro 0 (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+  ;(exibir-comeco-tab *tabuleiro)
+  (escreve-log *tabuleiro 0 0 *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
   (loop while (not (null (quatro-linha-p *tabuleiro))) ;(not (null (reserva *tabuleiro))))
         do
         (cond
-         ((no-solucaop (cria-no-alphabeta *tabuleiro)) (comecar))
          ((= *jogador 1)
-(princ "---HUM---") (exibir-tab *tabuleiro)
+          (princ "---HUM---") (exibir-tab *tabuleiro)
           (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
-                 (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro)) 0))
+                 (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro))))
                  (ler (ler-jogada casas pecas)))
             
             (cond
              ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
-             
-             (t (setf *tabuleiro (humano-quatro ler)) (escreve-log *tabuleiro *jogador (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
-                (terpri) (exibir-tab *tabuleiro)))
-            ) )
+             (t (setf *tabuleiro (humano-quatro ler)) ;(escreve-log *tabuleiro *jogador (- (get-internal-real-time) (get-internal-real-time)) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+                ))))
          (t (princ "---COM---") (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo *p))))
         (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (comecar))
 
