@@ -446,10 +446,16 @@ Retorna uma lista com todas as coordenadas vazias num tabuleiro.
 ```lisp
 ; funcao
 (defun casas-vazias (tab &optional (l 0))
-  (cond 
-   ((null tab) nil)
-    (t (append (coordenadas (car tab) l) 
-     (casas-vazias (cdr tab) (1+ l)))))) 
+  (labels (( coordenadas (fila l &optional (c 0))
+             (cond
+              ((null fila) nil)
+              ((eq (car fila) 0) 
+               (cons (list l c) (coordenadas (cdr fila) l (1+ c))))
+              (t (coordenadas (cdr fila) l (1+ c))))))
+             (cond 
+              ((null tab) nil)
+              (t (append (coordenadas (car tab) l) 
+                         (casas-vazias (cdr tab) (1+ l)))))))
 ```
 
 Tabuleiro vazio.
@@ -483,73 +489,6 @@ Tabuleiro com zero casas vazias.
 ; chamada
 CL-USER> (casas-vazias tabuleiro)
 NIL
-```
-
-#### <a nome="f-coordenadas">Coordenadas</a>
-Retorna uma lista com as coordenadas da fila do tabuleiro que se encontram vazias. Opcionalmente, coloca-se a coordenada da coluna.
-
-**Parâmetros**
-
-*fila - Fila do tabuleiro*
-
-*l - Coordenada da fila*
-
-*c - Coordenada da coluna (opcional)*
-
-```lisp
-; funcao
-(defun coordenadas (fila l &optional (c 0))
-  (cond
-   ((null fila) nil)
-   ((eq (car fila) 0) 
-    (cons (list l c) (coordenadas (cdr fila) l (1+ c))))
-   (t (coordenadas (cdr fila) l (1+ c)))))
-```
-
-Fila com um espaço vazio e a coordenada 2.
-
-```lisp
-; fila
-((branca quadrada baixa cheia) 0 (preta redonda alta cheia) (preta quadrada baixa oca))
-
-; chamada
-CL-USER> (coordenadas fila 2)
-((0 1))
-```
-
-Fila com dois espaços vazios e a coordenada 0.
-
-```lisp
-; fila
-((preta redonda alta cheia) (preta quadrada baixa oca) 0 0)
-
-; chamada
-CL-USER> (coordenadas fila 0)
-((0 2) (0 3))
-```
-
-Fila com zero espaços vazios e a coordenada 3.
-
-```lisp
-; fila
-((branca quadrada alta cheia)
-(branca quadrada alta oca)
-(branca quadrada baixa oca)
-(branca quadrada baixa cheia))
-
-; chamada
-CL-USER> (coordenadas fila 3)
-NIL
-```
-Fila com 4 espaços vazios e a coordenada 2.
-
-```lisp
-; fila
-(0 0 0 0)
-
-; chamada
-CL-USER> (coordenadas fila 1)
-((1 0) (1 1))
 ```
 
 #### <a nome="f-remove-peca">Remove-Peca</a>
@@ -726,30 +665,6 @@ CL-USER> (diagonais tabuleiro)
 (((PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA QUADRADA BAIXA OCA)) ((BRANCA QUADRADA BAIXA CHEIA) (BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA QUADRADA ALTA OCA)))
 ```
 
-#### <a nome="f-pretty-print">Pretty-Print</a>
-Retorna o tabuleiro com reserva, de forma a ser mais legível.
-
-**Parâmetros**
-
-*estado - Estado*
-
-```lisp
-; funcao
-(defun pretty-print (estado)
-  (format t "~%")
-  (format t "~S ~%" (tabuleiro estado))
-  (format t "~S ~%" (reserva estado)))
-```
-
-```lisp
-; chamada
-CL-USER 2 : 1 > (pretty-print (tab))
-
-((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) 
-((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA)) 
-NIL
-```
-
 ### <a nome="f-algoritmo">**Algoritmo**</a>
 
 #### <a nome="var-aux">Variáveis Auxiliares</a>
@@ -774,29 +689,19 @@ Controla o tempo de jogada admitido para o jogador PC.
 
 ```lisp
 ; funcao
-(defun jogar-quatro (tab tempo)
-    (let* (
-      (comecar (get-internal-real-time)) ;;start-time in miliseconds
-      (op (ab (no 1 -1)))
-      )
-
-    (cond
-      ((and (null (first indexes-player)) (null (second indexes-player)))
-        (setf op (max-first-move-value *player *board))
-        (setf jogada-atualizada (jogada linha coluna peca *tabuleiro))
-      )
-    )
-
-    (cond
-      ((not (null jogada-atualizada))
-        (display-computer-move *player (position-indexes-to-chess indexes-move) board-with-updated-player-position)
-
-        (sum-points move)
-
-        (escreve-log jogada-atualizada (get-play-time-milisecs play-start-time))
-        jogada-atualizada
-      )
-      (t *tabuleiro))))
+(defun jogar-quatro (tab tempo profundidade)
+(princ "jogar-quatro")
+  (setf *cortes-alfa* 0)
+  (setf *cortes-beta* 0)
+  (setf *nos-analisados* 0)
+  ;(let* (;(play-start-time (get-internal-real-time))
+         ;(op (alphabeta tab profundidade *jogador))
+         ;(tab-atual (tabuleiro (no-estado tab))))
+ (alphabeta tab profundidade *jogador)
+(princ *jogar*)
+    (setf *tabuleiro (no-estado *jogar*))
+    (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+    (no-estado *jogar*));)
 ```
 
 #### <a nome="f-comcom">Comcom</a>
@@ -809,16 +714,13 @@ Reinicia um jogo no modo PC versus PC, admitindo um determinado limite tempo do 
 
 ```lisp
 ; funcao
-(defun comcom (tempo)
-    (reiniciar)
-
-    (exibir-tab *tabuleiro)
-    
-    (loop while (or (not (no-solucaop *tabuleiro *jogador)) (not (no-solucaop *tabuleiro (outro-jogador *jogador))) (not (null (casas-vazias *tabuleiro))))
-      do
-
-      (setf *tabuleiro (jogar-quatro *tabuleiro tempo))
-      (setf *jogador (outro-jogador *jogador))))
+(defun comcom (tempo profundidade)
+  (reiniciar)
+  (exibir-tab *tabuleiro)
+  (loop while (not (null (quatro-linha-p *tabuleiro))) 
+        do
+        (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))
+        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (startup))
 ```
 
 #### <a nome="f-humcom">Humcom</a>
@@ -833,26 +735,28 @@ Reinicia um jogo no modo Humano versus PC, admitindo um determinado limite tempo
 
 ```lisp
 ; funcao
-(defun humcom (tempo &optional (j1 1))
+(defun humcom (tempo profundidade &optional (j1 1))
   (reiniciar)
   (setf *jogador j1)
-  (exibir-tab *tabuleiro)
-  (loop while (not (null (casas-vazias (tabuleiro *tabuleiro))))
+  (escreve-log *tabuleiro 0 (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+  (loop while (not (null (quatro-linha-p *tabuleiro))) ;(not (null (reserva *tabuleiro))))
         do
         (cond
+         ((no-solucaop (cria-no-alphabeta *tabuleiro)) (startup))
          ((= *jogador 1)
-          (let* ((pecas (reserva *tabuleiro))
-                 (casas (casas-vazias (tabuleiro *tabuleiro))))
-            
+          (exibir-tab *tabuleiro)
+(princ "---HUM---")
+          (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
+                 (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro)) 0))
+                 (ler (ler-jogada casas pecas)))
             (cond
-             ((no-solucaop *tabuleiro) (exibir-tab *tabuleiro) (terpri)
-             (format t "O vencedor: jogador ~a " (outro-jogador *jogador)) (menu-principal))
-             ((and (null pecas) (null casas)) (exibir-tab *tabuleiro) (terpri) (format t "Empate") (menu-principal))
-             (t (setf *tabuleiro (humano-quatro (ler-jogada casas pecas))) 
-            (setf *jogador (outro-jogador *jogador)) (exibir-tab *tabuleiro))); (humcom tempo (outro-jogador *jogador)))
-            ))
-         (t nil));(setf *tabuleiro (jogar-quatro *tabuleiro tempo))))
-        (setf *jogador (outro-jogador *jogador))))
+             ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
+             
+             (t (setf *tabuleiro (humano-quatro ler)) (escreve-log *tabuleiro *jogador (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+                (terpri) (exibir-tab *tabuleiro)))
+            ) )
+         (t (princ "---COM---") (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))))
+        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (startup))
 ```
 
 #### <a nome="f-jogada">Jogada</a>
@@ -889,7 +793,12 @@ Coloca todas as variaveis locais inicializadas em [variaveis auxiliares](#f-var-
 ```lisp
 (defun reiniciar ()
     (setf *tabuleiro (tab))
-    (setf *jogador 1)))
+    (setf *jogador 1)
+    (setf *cortes-alfa* 0)
+    (setf *cortes-beta* 0)
+    (setf *nos-analisados* 0)
+    (setf *nos-cortados*   0 )
+    (setf *nos-expandidos* 0 ))
 ```
 
 #### <a nome="f-outro-jogador">Outro-Jogador</a>
@@ -921,8 +830,8 @@ Gera um nó, utilizado no algoritmo minimax com cortes alphabeta, constituído p
 
 ```lisp
 ; funcao
-(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (alfa most-negative-double-float) (beta most-positive-double-float))
-  (list estado alfa beta profundidade pai))
+(defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (j1 *jogador) &aux (value (avaliar-no (list estado 0 j1 profundidade pai))))
+  (list estado value j1 profundidade pai))
 ```
 
 #### <a nome="f-p-tabuleiro-conteudo">Tabuleiro-Conteudo</a>
@@ -1013,9 +922,9 @@ Gera um novo nó sucessor, recebendo um nó por parâmetro.
 
 ```lisp
 ; funcao
-(defun novo-sucessor (no x)
-    (cond ((null no) nil)
-	  (t (list x (no-alpha no) (no-beta no) (1+ (no-profundidade-alphabeta no)) no))))
+(defun novo-sucessor (no estado jogador)
+  (cria-no-alphabeta estado (1+ (no-profundidade-alphabeta no)) no jogador))
+
 ```
 
 #### <a nome="f-p-sucessores-quatro">Sucessores-Quatro</a>
@@ -1031,19 +940,15 @@ Gera sucessores de um nó especificamente desenvolvido para o problema quatro.
 
 ```lisp
 ; funcao
-(defun sucessores-quatro (no operadoresf &optional (max-prof 0))
+(defun sucessores-quatro (no operadoresf &optional (max-prof 0) (jogador 0))
   (cond 
    ((null no) nil)
    ((>= (no-profundidade-alphabeta no) max-prof) nil)
-
    ((no-solucaop no) nil)
-   (t 
-    (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
-      (cond 
-       ((null coordenadas) NIL)
-       (t ;(funcall operadoresf (tabuleiro-conteudo no)))
-        (remove nil
-                  (mapcar #'(lambda (estado) (novo-sucessor no estado)) (funcall operadoresf (no-estado no))))))))))
+   (t (let ((coordenadas (casas-vazias (tabuleiro-conteudo no))))
+        (cond 
+         ((null coordenadas) NIL)
+         (t (remove nil (mapcar #'(lambda (estado) (cond ((null estado) NIL) (t (novo-sucessor no estado jogador)))) (funcall operadoresf (no-estado no))))))))))
 
 ```
 
@@ -1182,7 +1087,7 @@ Verifica se o no tem o estado solução, retornando T. Caso contrário retorna N
                                       (t 0))) #'(lambda (y) (> y 0)))))))
 ```
 
-#### <a nome="f-avaliar-no">Avaliar-No</a>
+#### <a nome="f-avaliar-no">Alphabeta</a>
 Algoritmo Alphabeta. Retorna o valor que corresponde ao vencedor, consuante os parâtmetros inseridos.
 
 Por vezes gera loop, quando a solução encontra-se numa profundidade abaixo da admitida por parâmetro.
@@ -1416,7 +1321,7 @@ Imprime na consola o tabuleiro.
             (write-line (write-to-string (mostra-reserva (reserva tab)))))))
 ```
 
-#### <a name="f-exibir-tab">Exibir-Tab</a>
+#### <a name="f-ler-jogada">Ler Jogada</a>
 Imprime na consola as coordenadas e as peças disponíveis para efetuar uma jogada.
 
 **Parâmetros**
