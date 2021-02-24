@@ -6,7 +6,7 @@
   (load (caminho "jogo.lisp"))
   (load (caminho "algoritmo.lisp")))
 
-(defun startup ()
+(defun comecar ()
   (loop
     (progn
       (format t "~%~%~%~%~%~%~%~%~%")
@@ -118,6 +118,10 @@
   (not (null (mapcar #'(lambda(l) 
         (format file-stream "~%~t~t ~a" l)) tab)))
   )
+ #| (cond 
+   ((null tab) (format file-stream ""))
+   ((tabuleiro-conteudo tab) (progn (Imprimir (tabuleiro-conteudo (car tab)) t) (format t "~%") (Imprimirard-file (tabuleiro-conteudo (cdr tab)) t)))
+   (t (progn (Imprimir (reserva (car tab)) t) (format t "~%") (print-board-file (reserva (cdr tab)) t) ))))|#
 
 
 (defun escreve-log (tab j tempo alfa beta nos-analisados nos-expandidos nos-cortados)
