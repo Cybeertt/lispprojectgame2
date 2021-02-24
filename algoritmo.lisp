@@ -22,7 +22,7 @@
   ;(let* (;(play-start-time (get-internal-real-time))
          ;(op (alphabeta tab profundidade *jogador))
          ;(tab-atual (tabuleiro (no-estado tab))))
- (alphabeta tab profundidade *jogador)
+ (alphabeta tab profundidade *jogador tempo)
 (princ *jogar*)
     (setf *tabuleiro (no-estado *jogar*))
     (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
