@@ -12,21 +12,26 @@
 
 (let (
   (*jogador 1)
-  (*tabuleiro (tab)))
+  (*tabuleiro (tab))
+  (*p 0))
 
 (defun jogar-quatro (tab tempo profundidade)
-(princ "jogar-quatro")
+  ;(princ "jogar-quatro")
+  ;(no-profundidade-alphabeta *jogar*)
   (setf *cortes-alfa* 0)
   (setf *cortes-beta* 0)
   (setf *nos-analisados* 0)
   ;(let* (;(play-start-time (get-internal-real-time))
          ;(op (alphabeta tab profundidade *jogador))
          ;(tab-atual (tabuleiro (no-estado tab))))
- (alphabeta tab profundidade *jogador)
-(princ *jogar*)
-    (setf *tabuleiro (no-estado *jogar*))
-    (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
-    (no-estado *jogar*) (exibir-tab *tabuleiro));)
+  (alphabeta tab profundidade *jogador)
+  (princ profundidade)
+  (cond
+   ((zerop profundidade) (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) (exibir-tab *tabuleiro))
+   ((= 1 (no-profundidade-alphabeta *jogar*)) (setf *tabuleiro (no-estado *jogar*)) (setf profundidade *p) (princ profundidade)
+      (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+      (no-estado *jogar*) )
+   (t (setf *jogar* (no-pai *jogar*)) (jogar-quatro tab tempo (- profundidade 1)))))
 
 (defun humano-quatro (jogo)
   (let ((joga (jogada (car jogo) (cadr jogo) (car (cddr jogo)) *tabuleiro)))
@@ -34,7 +39,7 @@
     (princ jogo)
     (cond
      ((null jogo) (setf joga *tabuleiro))
-     (t (format t "Jogada efetuada por jogador ~a" *jogador))) (princ "humano-quatro") joga))
+     (t (format t "Jogada efetuada por jogador ~a" *jogador))) joga))
 
 
 (defun comcom (tempo profundidade)
@@ -51,6 +56,8 @@
 (defun humcom (tempo profundidade &optional (j1 1))
   (reiniciar)
   (setf *jogador j1)
+  (setf *p profundidade)
+  (princ *p)
   (exibir-comeco-tab *tabuleiro)
   (escreve-log *tabuleiro 0 (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
   (loop while (not (null (quatro-linha-p *tabuleiro))) ;(not (null (reserva *tabuleiro))))
@@ -58,17 +65,18 @@
         (cond
          ((no-solucaop (cria-no-alphabeta *tabuleiro)) (comecar))
          ((= *jogador 1)
-(princ "---HUM---")
+(princ "---HUM---") (exibir-tab *tabuleiro)
           (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
                  (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro)) 0))
                  (ler (ler-jogada casas pecas)))
+            
             (cond
              ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
              
              (t (setf *tabuleiro (humano-quatro ler)) (escreve-log *tabuleiro *jogador (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
                 (terpri) (exibir-tab *tabuleiro)))
             ) )
-         (t (princ "---COM---") (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))))
+         (t (princ "---COM---") (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo *p))))
         (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (comecar))
 
 (defun reiniciar ()
