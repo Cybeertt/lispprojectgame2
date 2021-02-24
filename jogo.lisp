@@ -114,9 +114,10 @@
                                                          (jogada (car casa) (cadr casa) peca estado-jogo)) pecas)) casas))))
 
 ; (operadore-quatro (p))
-
+;|             0              |
+;|(branca redonda baixa cheia)|
 (defun mostra-tabuleiro (tab)
-  (let ((seperator "_________________________________________________________________________________________________________________________"))
+  (let ((seperator "____________________________________________________________________________________________"))
     (format nil "~%TABULEIRO~%~A~%~A~%~A~%~A~%~A~%~A~%~%" 
             seperator (mostra-linha 0 tab) (mostra-linha 1 tab) 
             (mostra-linha 2 tab) (mostra-linha 3 tab) seperator)))
