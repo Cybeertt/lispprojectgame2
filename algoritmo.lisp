@@ -26,24 +26,24 @@
 (princ *jogar*)
     (setf *tabuleiro (no-estado *jogar*))
     (escreve-log *tabuleiro *jogador (- (get-internal-real-time) tempo) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
-    (no-estado *jogar*));)
+    (no-estado *jogar*) (exibir-tab *tabuleiro));)
 
 (defun humano-quatro (jogo)
   (let ((joga (jogada (car jogo) (cadr jogo) (car (cddr jogo)) *tabuleiro)))
-(princ "------ ")
-(princ jogo)
+    (princ "------ ")
+    (princ jogo)
     (cond
      ((null jogo) (setf joga *tabuleiro))
      (t (format t "Jogada efetuada por jogador ~a" *jogador))) (princ "humano-quatro") joga))
 
 
 (defun comcom (tempo profundidade)
-    (reiniciar)
-    (exibir-tab *tabuleiro)
-    (loop while (not (null (quatro-linha-p *tabuleiro))) 
-          do
-          (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))
-      (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (startup))
+  (reiniciar)
+  (exibir-tab *tabuleiro)
+  (loop while (not (null (quatro-linha-p *tabuleiro))) 
+        do
+        (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))
+        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (comecar))
 
 ;jogada humana
 ;ganhar funcionar
@@ -51,13 +51,13 @@
 (defun humcom (tempo profundidade &optional (j1 1))
   (reiniciar)
   (setf *jogador j1)
+  (exibir-comeco-tab *tabuleiro)
   (escreve-log *tabuleiro 0 (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
   (loop while (not (null (quatro-linha-p *tabuleiro))) ;(not (null (reserva *tabuleiro))))
         do
         (cond
-         ((no-solucaop (cria-no-alphabeta *tabuleiro)) (startup))
+         ((no-solucaop (cria-no-alphabeta *tabuleiro)) (comecar))
          ((= *jogador 1)
-          (exibir-tab *tabuleiro)
 (princ "---HUM---")
           (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
                  (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro)) 0))
@@ -69,7 +69,7 @@
                 (terpri) (exibir-tab *tabuleiro)))
             ) )
          (t (princ "---COM---") (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))))
-        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (startup))
+        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (comecar))
 
 (defun reiniciar ()
     (setf *tabuleiro (tab))
