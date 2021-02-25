@@ -45,8 +45,8 @@ Neste manual encontram-se explicações sobre o jogo, como o iniciar, a estrutur
     * [No-Estado](#f-p-no-estado)
     * [No-Pai](#f-p-no-pai)
     * [No-Estado](#f-p-no-estado)
-    * [No-Alpha](#f-p-no-alpha)
-    * [No-Beta](#f-p-no-beta)
+    * [No-Value](#f-p-no-valor)
+    * [No-Jogador](#f-p-no-jogador)
     * [No-Profundidade.Alphabeta](#f-p-no-profundidade-alphabeta)
     * [Novo-Sucessor](#f-p-no-sucessor)
     * [Sucessores-Quatro](#-f-p-sucessores-quatro)
@@ -57,6 +57,8 @@ Neste manual encontram-se explicações sobre o jogo, como o iniciar, a estrutur
     * [No-Solucaop](#f-no-solucaop)
     * [Avaliar-No](#f-avaliar-no)
     * [Alphabeta](#f-alphabeta)
+    * [Alphabeta-Max](#f-alphabeta-max)
+    * [Alphabeta-Min](#f-alphabeta-min)
     * [Print-Hash-Entry](#f-print-hash-entry)
   * [Interact](#f-interact)
     * [Base-Pathname](#proj-constante-base-pathname)
@@ -802,7 +804,7 @@ Coloca todas as variaveis locais inicializadas em [variaveis auxiliares](#f-var-
 ```
 
 #### <a nome="f-outro-jogador">Outro-Jogador</a>
-Troca o valor simétrico do jogador. Por defeito o primeiro jogador corresponde ao valor 1 e o seu adversário ao seu valor simétrico.
+Retorna o valor simétrico do jogador. Por defeito o primeiro jogador corresponde ao valor 1 e o seu adversário ao seu valor simétrico.
 
 **Parâmetros**
 
@@ -811,6 +813,22 @@ Troca o valor simétrico do jogador. Por defeito o primeiro jogador corresponde 
 ```lisp
 (defun outro-jogador (j)
   (* -1 j))
+```
+
+Retorna o valor simétrico do jogador 1.
+
+```lisp
+; chamada
+CL-USER > (outro-jogador 1)
+-1
+```
+
+Retorna o valor simétrico do jogador -1.
+
+```lisp
+; chamada
+CL-USER > (outro-jogador -1)
+1
 ```
 
 #### <a nome="f-p-cria-no-alphabeta">Cria-No-Alphabeta</a>
@@ -824,14 +842,45 @@ Gera um nó, utilizado no algoritmo minimax com cortes alphabeta, constituído p
 
 *pai - Nó predecessor (opcional)*
 
-*alfa - Valor de alfa (opcional)*
-
-*beta - Valor de beta (opcional)*
+*j1 - Jogador, por defeito utiliza a variavél local *jogador como valor válido (opcional)*
 
 ```lisp
 ; funcao
 (defun cria-no-alphabeta (estado &optional (profundidade 0) (pai NIL) (j1 *jogador) &aux (value (avaliar-no (list estado 0 j1 profundidade pai))))
   (list estado value j1 profundidade pai))
+```
+
+Retorna um nó por defeito, utilizado com o algoritmo [alphabeta](#f-alphabeta).
+
+```lisp
+; a funcao (tab) retorna um tabuleiro vazio com reserva de pecas
+
+; chamada
+CL-USER > (cria-no-alphabeta (tab))
+((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+```
+
+Retorna um nó com profundidade 1, utilizado com o algoritmo [alphabeta](#f-alphabeta).
+
+```lisp
+; embora seja possivel, a profundidade apenas deverá ser alterada quando o estado muda e exsite um no pai
+
+; (tab) retorna um tabuleiro vazio com reserva de pecas
+
+; chamada
+CL-USER > (cria-no-alphabeta (tab) 10)
+((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 1 NIL)
+```
+
+Retorna um nó com profundidade 1 e com nó pai, utilizado com o algoritmo [alphabeta](#f-alphabeta).
+
+```lisp
+; no e um no anteriormente gerado
+; estado com uma peca retirada da reserva e colocada no tabuleiro
+
+; chamada
+CL-USER > (cria-no-alphabeta estado 1 no)
+((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
 ```
 
 #### <a nome="f-p-tabuleiro-conteudo">Tabuleiro-Conteudo</a>
@@ -847,6 +896,28 @@ Retorna o tabuleiro que se encontra no estado do nó.
   (caar no))
 ```
 
+Retorna o tabuleiro do nó inicial.
+
+```lisp
+; no do tipo alphabeta
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (tabuleiro-conteudo no)
+((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0))
+```
+
+Retorna o tabuleiro do nó sucessor.
+
+```lisp
+; no do tipo alphabeta com um nó pai.
+'((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
+
+; chamada
+CL-USER > (tabuleiro-conteudo no)
+((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0))
+```
+
 #### <a nome="f-p-no-pai">No-Pai</a>
 Retorna o no predecessor do nó.
 
@@ -857,6 +928,28 @@ Retorna o no predecessor do nó.
 ```lisp
 (defun no-pai (no)
   (car (cddddr no)))
+```
+
+Retorna o nó pai do nó inicial.
+
+```lisp
+; no do tipo alphabeta
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-pai no)
+NIL
+```
+
+Retorna o nó pai do nó sucessor.
+
+```lisp
+; no do tipo alphabeta com um nó pai.
+'((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
+
+; chamada
+CL-USER > (no-pai no)
+((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
 ```
 
 #### <a nome="f-p-no-estado">No-Estado</a>
@@ -872,8 +965,30 @@ Retorna o estado do nó.
   (car no))
 ```
 
-#### <a nome="f-p-no-alpha">No-Alpha</a>
-Retorna o nó Alfa do nó.
+Retorna o estado do nó inicial.
+
+```lisp
+; no do tipo alphabeta
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-estado no)
+(((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA)))
+```
+
+Retorna o estado do nó sucessor.
+
+```lisp
+; no do tipo alphabeta com um nó pai.
+'((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
+
+; chamada
+CL-USER > (no-estado no)
+(((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA)))
+```
+
+#### <a nome="f-p-no-alpha">No-Value</a>
+Retorna o valor heuristico do nó.
 
 **Parâmetros**
 
@@ -881,12 +996,34 @@ Retorna o nó Alfa do nó.
 
 ```lisp
 ; funcao
-(defun no-alpha (no)
+(defun no-value (no)
   (cadr no))
 ```
 
-#### <a nome="f-p-no-beta">No-Beta</a>
-Retorna o nó Beta do nó.
+Retorna o valor heuristico do nó inicial.
+
+```lisp
+; no do tipo alphabeta
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-estado no)
+0
+```
+
+Retorna o valor heuristico do nó sucessor.
+
+```lisp
+; no do tipo alphabeta com um nó pai.
+'((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
+
+; chamada
+CL-USER > (no-estado no)
+2
+```
+
+#### <a nome="f-p-no-beta">No-Jogador</a>
+Retorna o jogador do nó.
 
 **Parâmetros**
 
@@ -894,8 +1031,30 @@ Retorna o nó Beta do nó.
 
 ```lisp
 ; funcao
-(defun no-beta (no)
+(defun no-jogador (no)
   (caddr no))
+```
+
+Retorna o valor heuristico do nó inicial.
+
+```lisp
+; no do tipo alphabeta
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-estado no)
+-1
+```
+
+Retorna o valor heuristico do nó sucessor.
+
+```lisp
+; no do tipo alphabeta com um nó pai.
+'((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
+
+; chamada
+CL-USER > (no-estado no)
+1
 ```
 
 #### <a nome="f-p-no-profundidade-alphabeta">No-Profundidade-Alphabeta</a>
@@ -911,6 +1070,28 @@ Retorna a profundidade do nó.
   (cadddr no))
 ```
 
+Retorna a profundidade do nó inicial.
+
+```lisp
+; no do tipo alphabeta
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-estado no)
+0
+```
+
+Retorna a profundiade do nó sucessor.
+
+```lisp
+; no do tipo alphabeta com um nó pai.
+'((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
+
+; chamada
+CL-USER > (no-estado no)
+1
+```
+
 #### <a nome="f-p-novo-sucessor">Novo-Sucessor</a>
 Gera um novo nó sucessor, recebendo um nó por parâmetro.
 
@@ -924,7 +1105,20 @@ Gera um novo nó sucessor, recebendo um nó por parâmetro.
 ; funcao
 (defun novo-sucessor (no estado jogador)
   (cria-no-alphabeta estado (1+ (no-profundidade-alphabeta no)) no jogador))
+```
 
+Retorna um novo nó sucessor com nó pai, um novo estado e jogador 1.
+
+```lisp
+; no
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; estado
+'(((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA)))
+
+; chamada
+CL-USER > (novo-sucessor no estado 1)
+((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
 ```
 
 #### <a nome="f-p-sucessores-quatro">Sucessores-Quatro</a>
@@ -938,6 +1132,8 @@ Gera sucessores de um nó especificamente desenvolvido para o problema quatro.
 
 *max-prof - Máxima profundidade (opcional)*
 
+*jogador - Jogador (opcional)*
+
 ```lisp
 ; funcao
 (defun sucessores-quatro (no operadoresf &optional (max-prof 0) (jogador 0))
@@ -949,11 +1145,23 @@ Gera sucessores de um nó especificamente desenvolvido para o problema quatro.
         (cond 
          ((null coordenadas) NIL)
          (t (remove nil (mapcar #'(lambda (estado) (cond ((null estado) NIL) (t (novo-sucessor no estado jogador)))) (funcall operadoresf (no-estado no))))))))))
+```
 
+Retorna uma lista de sucessores para o jogador 1, com a profundidade máxima do algoritmo [alphabeta](#f-alphabeta).
+
+```lisp
+; no
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+CL-USER > (sucessores-quatro no #'operadores-quatro 1 1)
+; lista de n nos sucessores
+
+; exemplo de um novo sucessor
+((((0 (BRANCA REDONDA BAIXA OCA) 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 2 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL))
 ```
 
 #### <a nome="f-p-operadores-quatro">Operadores-Quatro</a>
-Aplica a um estado todos os movimentos possíveis do jogo, designados por operadores.
+Aplica a um estado, todos os movimentos possíveis do jogo, designados por operadores, retornando todos os estados possíveis do estado inicial.
 
 **Parâmetros**
 
@@ -966,6 +1174,20 @@ Aplica a um estado todos os movimentos possíveis do jogo, designados por operad
         (pecas (reserva estado-jogo)))
     (apply #'append (mapcar #'(lambda (casa)
                 (mapcar #'(lambda (peca) (jogada (car casa) (cadr casa) peca estado-jogo)) pecas)) casas))))
+```
+
+Retorna uma lista de estados.
+
+```lisp
+; estado
+'(((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA)))
+
+; chamada
+CL-USER > (operadores-quatro estado)
+; lista de n estados
+
+; exemplo de um novo estado
+(((0 0 0 0) (0 0 (PRETA REDONDA ALTA OCA) 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA)))
 ```
 
 #### <a nome="f-p-quatro-linha-p">Quatro-Linha-P</a>
@@ -992,6 +1214,50 @@ Verifica se o tabuleiro possui quatro peças com pelo menos um atributo em comum
        (t (reduce #'(lambda (&optional x y) (or x y)) (mapcar #'sao-iguaisp linhas-cheias))))))))
 ```
 
+Verifica se o tabuleiro tem quatro peças alinhadas com pelo menos um atributo em comum, num tabuleiro vazio.
+
+```lisp
+; tabuleiro vazio
+'((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0))
+
+; chamada
+CL-USER > (quatro-linha-p tabuleiro)
+NIL
+```
+
+Verifica se o tabuleiro tem quatro peças alinhadas com pelo menos um atributo em comum, num tabuleiro com 4 pecas não alinhadas.
+
+```lisp
+; tabuleiro com quatro pecas nao alinhadas
+'((0 0 (PRETA REDONDA ALTA OCA) 0) ((BRANCA QUADRADA BAIXA CHEIA) 0 0 0) (0 (PRETA QUADRADA ALTA CHEIA) 0 0) (0 0 0 (PRETA QUADRADA BAIXA CHEIA)))
+
+; chamada
+CL-USER > (quatro-linha-p tabuleiro)
+NIL
+```
+
+Verifica se o tabuleiro tem quatro peças alinhadas com pelo menos um atributo em comum, num tabuleiro com 4 peças alinhadas, mas uma das peças com o menor de atributos em comum.
+
+```lisp
+; tabuleiro com 4 pecas alinhadas, mas uma peca sem  atributos em comum
+'((0 0 (PRETA REDONDA ALTA OCA) 0) (0 0 (BRANCA QUADRADA BAIXA CHEIA) 0) (0 0 (PRETA QUADRADA ALTA CHEIA) 0) (0 0 (PRETA QUADRADA BAIXA CHEIA) 0))
+
+; chamada
+CL-USER > (quatro-linha-p tabuleiro)
+NIL
+```
+
+Verifica se o tabuleiro tem quatro peças alinhadas com pelo menos um atributo em comum, num tabuleiro com 4 peças alinhadas, todas com um atributo em comum.
+
+```lisp
+; tabuleiro com 4 pecas alinhadas, todas as pecas com pelo menos um atributo em comum
+'((0 0 (PRETA REDONDA ALTA CHEIA) 0) (0 0 (BRANCA QUADRADA BAIXA CHEIA) 0) (0 0 (PRETA QUADRADA ALTA CHEIA) 0) (0 0 (PRETA QUADRADA BAIXA CHEIA) 0))
+
+; chamada
+CL-USER > (quatro-linha-p tabuleiro)
+T
+```
+
 #### <a nome="f-p-max-p-a">Max-p-a</a>
 Verifica se o tabuleiro possui peças com pelo menos um atributo em comum e retorna uma lista com a contágem máxima de peças por linha, coluna e diagonais.
 
@@ -1016,6 +1282,50 @@ Verifica se o tabuleiro possui peças com pelo menos um atributo em comum e reto
        (t (reduce #'max (mapcar #'max (remove nil (mapcar #'(lambda (em-linha len) (and em-linha len))
                                 (mapcar #'sao-iguaisp linhas-pecas)
                                 (mapcar #'length linhas-pecas)))))))))))
+```
+
+Retorna o número máximo de peças alinhadas com pelo menos um atributo em comum, num tabuleiro vazio.
+
+```lisp
+; tabuleiro vazio
+'((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0))
+
+; chamada
+CL-USER > (max-p-a tabuleiro)
+0
+```
+
+Retorna o número máximo de peças alinhadas com pelo menos um atributo em comum, num tabuleiro com 4 pecas não alinhadas.
+
+```lisp
+; tabuleiro com quatro pecas nao alinhadas
+'((0 0 (PRETA REDONDA ALTA OCA) 0) ((BRANCA QUADRADA BAIXA CHEIA) 0 0 0) (0 (PRETA QUADRADA ALTA CHEIA) 0 0) (0 0 0 (PRETA QUADRADA BAIXA CHEIA)))
+
+; chamada
+CL-USER > (max-p-a tabuleiro)
+1
+```
+
+Verifica se o tabuleiro tem quatro peças alinhadas com pelo menos um atributo em comum, num tabuleiro com 4 peças alinhadas, mas uma das peças com o menor de atributos em comum.
+
+```lisp
+; tabuleiro com 4 pecas alinhadas, mas uma peca sem  atributos em comum
+'((0 0 (PRETA REDONDA ALTA OCA) 0) (0 0 (BRANCA QUADRADA BAIXA CHEIA) 0) (0 0 (PRETA QUADRADA ALTA CHEIA) 0) (0 0 (PRETA QUADRADA BAIXA CHEIA) 0))
+
+; chamada
+CL-USER > (max-p-a tabuleiro)
+1 ;!? deveria ter 3 pecas
+```
+
+Verifica se o tabuleiro tem quatro peças alinhadas com pelo menos um atributo em comum, num tabuleiro com 4 peças alinhadas, todas com um atributo em comum.
+
+```lisp
+; tabuleiro com 4 pecas alinhadas, todas as pecas com pelo menos um atributo em comum
+'((0 0 (PRETA REDONDA ALTA CHEIA) 0) (0 0 (BRANCA QUADRADA BAIXA CHEIA) 0) (0 0 (PRETA QUADRADA ALTA CHEIA) 0) (0 0 (PRETA QUADRADA BAIXA CHEIA) 0))
+
+; chamada
+CL-USER > (quatro-linha-p tabuleiro)
+4
 ```
 
 #### <a nome="f-sao-iguais">Sao-Iguaisp</a>
@@ -1049,6 +1359,50 @@ Verifica se o no tem o estado solução, retornando T. Caso contrário retorna N
 ; funcao
 (defun no-solucaop (no)
   (if (null no) nil (quatro-linha-p (tabuleiro-conteudo no))))
+```
+
+Verifica se o nó com estado inicial é solução.
+
+```lisp
+; no com o tabuleiro vazio
+'((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-solucao no)
+NIL
+```
+
+Verifica se o nó com estado de um tabuleiro preenchido com 4 peças não alinhadas, é solução.
+
+```lisp
+; no com o tabuleiro com 4 pecas nao alinhadas
+'((((0 0 (PRETA REDONDA ALTA OCA) 0) ((BRANCA QUADRADA BAIXA CHEIA) 0 0 0) (0 (PRETA QUADRADA ALTA CHEIA) 0 0) (0 0 0 (PRETA QUADRADA BAIXA CHEIA)))((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-solucao no)
+NIL
+```
+
+Verifica se o nó com estado de um tabuleiro preenchido com quatro peças alinhadas, com 3 peças com pelo menos um atributo em comum e uma das peças com o menor de atributos em comum, é solução.
+
+```lisp
+; no com o tabuleiro com quatro pecas alinhadas, com 3 peças com pelo menos um atributo em comum e uma das pecas com o menor de atributos em comum
+'((((0 0 (PRETA REDONDA ALTA OCA) 0) (0 0 (BRANCA QUADRADA BAIXA CHEIA) 0) (0 0 (PRETA QUADRADA ALTA CHEIA) 0) (0 0 (PRETA QUADRADA BAIXA CHEIA) 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-solucao no)
+NIL
+```
+
+Verifica se o nó com estado de um tabuleiro preenchido com quatro peças alinhadas, todas as peças com pelo menos um atributo em comum, é solução.
+
+```lisp
+; no com o tabuleiro com quatro peças alinhadas, todas as pecas com pelo menos um atributo em comum
+'((((0 0 (PRETA REDONDA ALTA CHEIA) 0) (0 0 (BRANCA QUADRADA BAIXA CHEIA) 0) (0 0 (PRETA QUADRADA ALTA CHEIA) 0) (0 0 (PRETA QUADRADA BAIXA CHEIA) 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 -1 0 NIL)
+
+; chamada
+CL-USER > (no-solucao no)
+T
 ```
 
 #### <a nome="f-avaliar-no">Avaliar-No</a>
@@ -1087,10 +1441,39 @@ Verifica se o no tem o estado solução, retornando T. Caso contrário retorna N
                                       (t 0))) #'(lambda (y) (> y 0)))))))
 ```
 
-#### <a nome="f-avaliar-no">Alphabeta</a>
-Algoritmo Alphabeta. Retorna o valor que corresponde ao vencedor, consuante os parâtmetros inseridos.
+Retorna o valor de um nó inicial.
 
-Por vezes gera loop, quando a solução encontra-se numa profundidade abaixo da admitida por parâmetro.
+```lisp
+; no com tabuleiro vazio
+
+; chamada
+CL-USER > (avaliar-no no)
+0
+```
+
+Retorna o valor de um nó com tabuleiro preenchido com 4 peças não alinhadas.
+
+```lisp
+; no com tabuleiro 4 peças nao alinhadas
+
+; chamada
+CL-USER > (avaliar-no no)
+0
+```
+
+Retorna o valor de um nó com tabuleiro preenchido com 4 peças. Três alinhadas com pelo menos um atributo em comum e uma peça com o menor número de atributos em comum.
+
+```lisp
+; no com tabuleiro 4 peças nao alinhadas
+; 3 alinhadas com pelo menos um atributo em comum e 1 peca com o menor numero de atributos em comum
+
+; chamada
+CL-USER > (avaliar-no no)
+10000
+```
+
+#### <a nome="f-alphabeta">Alphabeta</a>
+Algoritmo Alphabeta. Retorna o valor heuristico, correspondente ao vencedor.
 
 **Parâmetros**
 
@@ -1100,35 +1483,113 @@ Por vezes gera loop, quando a solução encontra-se numa profundidade abaixo da 
 
 *jogador - Jogador*
 
+*tempo - Tempo máximo de turno*
+
+*alpha - Valor de alfa (opcional)*
+
+*beta - Valor de beta (opcional)*
+
 ```lisp
 ; funcao
-(defun ab (no profundidade jogador)
+(defun alphabeta (no profundidade jogador &optional (tempo 6000) (alpha most-negative-fixnum) (beta most-positive-fixnum))
   (cond
-   ((or (zerop profundidade) (null (sucessores-quatro no #'operadores-quatro profundidade)))
-    (avaliar-no no jogador))
-   ((> jogador 0)
-    (let* ((value-max most-negative-double-float)
-           (adversario (outro-jogador jogador))
-           (descendentes (remove-if #'(lambda (x) (null x)) 
-                                    (sucessores-quatro no #'operadores-quatro profundidade))) (alpha (no-alpha no)))    
-      (dolist (d descendentes)
-        (let* ((value-aux (max value-max (ab d (- profundidade 1) adversario)))
-               (alpha-aux (max alpha value-aux)))
-          (cond 
-           ((no-solucaop d) (setf value-max value-aux) (setf alpha alpha-aux) (return))
-           ((>= alpha-aux (no-beta no)) (return))
-           (t (setf value-max value-aux) (setf alpha alpha-aux))))) value-max))
-   (t (let* ((value-min most-positive-double-float)
-             (adversario (outro-jogador jogador))
-             (descendentes (remove-if #'(lambda (x) (null x)) (sucessores-quatro no #'operadores-quatro profundidade)))
-             (beta (no-beta no)))
-        (dolist (d descendentes)
-          (let* ((value-aux (min value-min (ab d (- profundidade 1) adversario)))
-                 (beta-aux (min beta value-aux)))
-            (cond 
-             ((no-solucaop d) (setf value-min value-aux) (setf beta beta-aux) (return))
-             ((<= beta-aux (no-alpha no)) (return))
-             (t (setf value-min value-aux) (setf beta beta-aux))))) value-min))))
+   ; no solucao
+   ((no-solucaop no)
+    (no-value no)) ; valor heuristico calculado
+   ; condicoes de paragem: profundidade zero or no ternimal
+   ((or (zerop profundidade) (null (sucessores-quatro no #'operadores-quatro profundidade jogador)))
+    (no-value no)) ; valor heuristico calculado
+   (t (let* ((sucessores (remove-if #'(lambda (s) (null s)) (sucessores-quatro no #'operadores-quatro profundidade jogador)))
+             (tamanho (length sucessores)))
+        (cond
+         ; max
+         ((> jogador 0)
+          (let* ((sucessores-max (sorter sucessores 'max)))
+            (progn (setf *nos-expandidos* (+ *nos-expandidos* tamanho))
+              (alphabeta-max profundidade jogador sucessores-max tempo alpha beta))))
+         ; min
+         (t (let* ((sucessores-min (sorter sucessores 'min)))
+              (progn (setf *nos-expandidos* (+ *nos-expandidos* tamanho))
+              (alphabeta-min profundidade jogador sucessores-min tempo alpha beta)))
+))))))
+```
+
+Retorna o valor heuristico do vencedor quando é o turno do jogador 1.
+
+```lisp
+; no
+'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) 44 -1 0 NIL)
+
+; chamada
+CL-USER > (alphabeta no 10 1 (+ (get-internal-real-time) 6000))
+-10006
+```
+
+Retorna o valor heuristico do vencedor quando é o turno do jogador -1.
+
+```lisp
+; no
+'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) 44 1 0 NIL)
+
+; chamada
+CL-USER > (alphabeta no 10 -1 (+ (get-internal-real-time) 6000))
+10006
+```
+
+#### <a nome="f-alphabeta-max">Alphabeta-Max</a>
+Função auxiliar recursiva que prócura o valor máximo heuristico dos sucessores. Esta função auxilia o algoritmo [alphabeta](#f-alphabeta), quando o jogador é max.
+
+**Parâmetros**
+*profundidade - Profundidade máxima admissível*
+
+*jogador - Jogador*
+
+*sucessores - Lista de sucessores (opcional)*
+
+*tempo - Tempo maximo de jogada*
+
+```lisp
+; funcao auxiliar max
+(defun alphabeta-max (profundidade jogador &optional (sucessores NIL) (tempo 6000) (alpha most-negative-fixnum) (beta most-positive-fixnum) &aux (sucessor (car sucessores)) (tempo-agora (get-internal-real-time)))
+  (cond
+   ((= tempo tempo-agora) alpha) ; sem tempo
+   ((null sucessores) alpha) ; sem sucessores
+   (t
+    ; algoritmo alphabeta
+    (let* ((value (max alpha (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) tempo alpha beta)))
+           (a (max alpha value)))
+      (cond
+       ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) alpha) ; condicao de corte: alpha >= beta
+       (t (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) 
+          (max a (alphabeta-max profundidade jogador (cdr sucessores) tempo a beta))))))))
+```
+
+#### <a nome="f-alphabeta-min">Alphabeta-Min</a>
+Função auxiliar recursiva que prócura o valor minimo heuristico dos sucessores. Esta função auxilia o algoritmo [alphabeta](#f-alphabeta), quando o jogador é min.
+
+**Parâmetros**
+*profundidade - Profundidade máxima admissível*
+
+*jogador - Jogador*
+
+*sucessores - Lista de sucessores (opcional)*
+
+*tempo - Tempo maximo de jogada*
+
+```lisp
+; funcao auxiliar min
+(defun alphabeta-min (profundidade jogador &optional (sucessores NIL) (tempo 6000) (alpha most-negative-fixnum) (beta most-positive-fixnum) &aux (sucessor (car sucessores)) (tempo-agora (get-internal-real-time)))
+  (cond
+   ((= tempo tempo-agora) beta) ; sem tempo
+   ((null sucessores) beta) ; sem sucessores
+   (t
+    ; algoritmo alphabeta
+    (let* ((value (min beta (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) tempo alpha beta)))
+           (b (min beta value)))
+      (cond
+       ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) beta) ; condicao de corte: beta <= alpha
+       (t (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) 
+          (min b (alphabeta-min profundidade jogador (cdr sucessores) tempo alpha b))))))))
 ```
 
 #### <a nome="f-print-hash-entry">Print-Hash-Entry</a>
