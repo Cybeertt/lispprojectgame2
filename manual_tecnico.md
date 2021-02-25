@@ -81,11 +81,15 @@ Quatro, é um jogo que contém um tabuleiro 4x4 e 16 peças com quatro carateris
 Quatro, é um jogo sequêncial disputado por 2 competidores.
 O jogo é realizado num tabuleiro 4x4 e 16 peças com 4 carateristicas.
 
-A cada turno, a peça é sempre escolhida pelo adversário que tem como missão entregar a peça com menos atributos iguais às peças que atualmente se encontram no tabuleiro.
+Segundo as regras normais do Quatro, a cada turno, a peça é sempre escolhida pelo adversário que tem como missão entregar a peça com menos atributos iguais às peças que atualmente se encontram no tabuleiro.
 
-O Quatro finaliza quando um jogador consegue alinhar 4 peças com pelo menos uma carateristica em comum, seja na vertical, horizontal ou diagonal, independentemente da direção.
+O mecanismo implementado do Quatro, essa regra não é aplicada, de forma que cada jogador decide qual a peça a ser utilizada na jogada.
 
-Nesta versão do manual, o Quatro tem dois tipo de jogos: Humano versus Pc e PC versus PC, aplicando o algoritmo minimax com cortes alphabeta. Sempre que um jogo terminar, este é disponível na consola, permitindo saber qual dos jogadores ganhou.
+O jogo finaliza quando um jogador consegue alinhar 4 peças com pelo menos uma carateristica em comum, seja na vertical, horizontal ou diagonal, independentemente da sua direção.
+
+Nesta versão do manual, o Quatro tem dois tipo de jogos: Humano versus Pc e PC versus PC, aplicando o algoritmo minimax com cortes alphabeta.
+
+Sempre que um jogo terminar, este é disponível na consola, permitindo saber qual dos jogadores ganhou.
 
 ## <a name="doc-estrutura">**Estrutura do Projeto**</a>
 O projeto encontra-se distribuído por 3 ficheiros principais: ***interact.lisp***, ***puzzle.lisp*** e ***algoritmo.lisp***.
@@ -98,9 +102,7 @@ O ficheiro ***algoritmo.lisp*** contém todos os algoritmos de procura de estado
 
 Em conjunto com os 3 ficheiros acima indicados, também se encontra-se em anexo o ***log.dat***.
 
-O ***log.dat*** contém em formato de lista em Common Lisp, uma série de tabuleiros com peças em situações diferentes do jogo.
-
-Este ficheiro guarda vários resultados estatisticos relacionados com cada jogo jogado
+O ***log.dat*** guarda todos os resultados estatisticos de qualquer jogo executado, permitindo analizar as jogadas efetuadas.
 
 ## <a name="doc-func">**Documentação de Funções**</a>
 
@@ -1863,10 +1865,18 @@ Imprime na consola o tabuleiro.
 ```
 
 ## <a name="conclusao">**Conclusão**</a>
-O processo de criar um jogo estratégico, como dois adversários são similares em termos de funcionamento. As funções desenvolvidas, por maioria foram reutilizadas para os modos de jogo: Humano versos PC e PC versus PC, com algumas excessões.
+O processo de criar um jogo estratégico com dois adversários, são similares em termos de funcionamento, ao projeto anterior. As funções desenvolvidas, foram reutilizadas na sua maioria para os modos de jogo: Humano versos PC e PC versus PC, com algumas excessões.
 
-No entanto, foi bastantes interessante aplicar esta metodologia em pártica, por ser não só uma mais valia, mas uma experiência, que permite demostrar a verdadeira Inteligência Artificial representada em jogos. Aceitamos que existem outros tipos de Inteligência Artificial mais desenvolvidos e aplicadas aos jogos atuais.
+Essas excessões acatam à necessidade de adaptação do código na tentativa de resolver o problema de encontrar a melhor jogada para um dado estado.
 
-A utilização do algoritmo Aplhabeta permitio criar referência para futuros projetos e pôs em perspetiva sobre os outros algoritmos utilizados na fase do projeto anterior. Uma observação que se encontrou comum a todos os algoritmos foi o erro de stack overflow quando existem demasiados nós sucessores a serem gerados ou à profundidade não ser suficiente para obter o nó solução.
+No entanto, foi bastantes interessante aplicar esta metodologia em pártica, por ser não só uma mais valia, mas uma experiência, que permite demostrar a verdadeira Inteligência Artificial representada em jogos. No entanto, aceitamos que existem outros tipos de Inteligência Artificial mais desenvolvidos e aplicadas aos jogos atuais.
 
-Perante este trabalho, podemos concluir que não é uma mais valia, só em termos académicos, como também é uma influência para qualquer tipo de software a ser desenvolvido.
+A utilização do algoritmo Aplhabeta permitio criar referência para futuros projetos e pôs em perspetiva sobre os outros algoritmos utilizados na fase do projeto anterior.
+
+Uma observação que se encontrou comum a todos os algoritmos foi o erro de stack overflow quando existe um excesso de nós sucessores a serem gerados, juntamente com a utilização da função trace.
+
+Embora expressamos o nosso interesse no algoritmo Alphabeta, o percurso da sua implementação e na extração da jogada ótima, consideramos que foi até ao momento, o mais dificil. 
+
+Inequivocamente, assumimos que ainda somos inexperiêntes na analise de grandes quantidade de informação disponibilizadas pela função trace, quando existe a necessidade de relizar debug.
+
+Concluíndo este projeto, consideramos que este seja uma mais valia, não só em termos académicos, mas por ser uma grande influência para qualquer tipo de software desenvolvido que necessite de soluções ótimas.
