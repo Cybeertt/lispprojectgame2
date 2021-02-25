@@ -7,6 +7,7 @@
   (load (caminho "algoritmo.lisp")))
 
 (defun comecar ()
+  (reiniciar)
   (loop
     (progn
       (format t "~%~%~%~%~%~%~%~%~%")
