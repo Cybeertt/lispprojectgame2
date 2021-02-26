@@ -4,6 +4,8 @@
 (defvar *nos-cortados*   0 )
 (defvar *nos-expandidos* 0 )
 (defvar *jogar* NIL)
+(defvar *sc NIL)
+(defvar *scm NIL)
 
 (defparameter *dispersao* (make-hash-table))
 
@@ -158,12 +160,13 @@ a verificacao se o jogador e max ou min.|#
          ; max
          ((> jogador 0); (sort-max sucessores)
           (let* ((sucessores-max (sorter sucessores 'max)))
-            (progn (setf *nos-expandidos* (+ *nos-expandidos* tamanho))
+            
+            (progn (setf *sc sucessores-max) (setf *nos-expandidos* (+ *nos-expandidos* tamanho))
               (alphabeta-max profundidade jogador sucessores-max tempo alpha beta))))
          ; min
          ;(sort-min sucessores)
          (t (let* ((sucessores-min (sorter sucessores 'min)))
-              (progn (setf *nos-expandidos* (+ *nos-expandidos* tamanho))
+              (progn (setf *scm sucessores-min) (setf *nos-expandidos* (+ *nos-expandidos* tamanho))
               (alphabeta-min profundidade jogador sucessores-min tempo alpha beta)))))))))
 
 #|2. Alphabeta-max que seria uma funcao auxiliar que iria ser chamada sempre que o jogador e 
@@ -181,7 +184,7 @@ para que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
        ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) alpha) ; condicao de corte: alpha >= beta
        (t (cond 
            ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)))
-            (max a (alphabeta-max profundidade jogador (cdr sucessores) tempo a beta)))
+            (max a (alphabeta-max profundidade jogador (cdr *sc) tempo a beta)))
            (t (alphabeta-max profundidade jogador (cddddr sucessor) tempo a beta))))))))) ; recursividade
 
 #|3. Alphabeta-min que seria uma funcao auxiliar que iria ser chamada sempre que o jogador e min 
@@ -198,7 +201,7 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
       (cond
        ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) beta) ; condicao de corte: beta <= alpha
        (t (cond 
-           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) (min b (alphabeta-min profundidade jogador (cdr sucessores) tempo alpha b)))
+           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) (min b (alphabeta-min profundidade jogador (cdr *scm) tempo alpha b)))
            (t (alphabeta-min profundidade jogador (cddddr sucessor) tempo alpha b)))))))))
 
 #|END Alphabeta functions|#
