@@ -59,9 +59,9 @@ Abra o LispWorks e abra os três ficheiros: ***interact.LISP***, ***jogo.LISP***
 
 Compile os três ficheiros acima e verifique a existência, na pasta onde se encontram os três ficheiros acima, o ficheiro: ***log.dat***.
 
-Se faltar o ficheiro ***log.dat***, apresentaremos uma explicação de como criar um ficheiro parecido em [Problemas](#tut-problemas).
+Se faltar o ficheiro ***log.dat***, apresentaremos uma explicação de como criar um ficheiro parecido em [Log](#tut-log).
 
-Assumindo que já compilou os três ficheiros projeto, puzzle e procura, e existe o ficheiro problemas, coloque no listener da ferramente LispWorks:
+Assumindo que já compilou os três ficheiros projeto, jogo, algoritmo, e interact, coloque no listener da ferramente LispWorks:
 
 ```l
 (comecar)
