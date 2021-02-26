@@ -15,13 +15,8 @@ Neste manual encontram-se explicações sobre o jogo, como o iniciar, a estrutur
 * [Abstrato](#doc-abstract)
 * [Estrutura do Projeto](#doc-estrutura)
 * [Iniciar Programa](#tut-iniciar)
-    * [Resolver Jogo](#mc-resolve-jogo)
-        * [Resolver Problema](#mc-problema)
-            * [BFS](#mc-bfs)
-            * [DFS](#mc-dfs)
-            * [A*](#mc-a-star)
-            * [Home Menu](#mc-home-menu)
-    * [Mostrar Regras](#mc-ver-regras)
+    * [Humano contra Computador](#mc-humano-contra-computador)
+    * [Computador contra Computador](#mc-computador-contra-computador)
     * [Sair do Programa](#sair-programa)
 * [Problemas](#tut-problemas)
 * [Glossário](#glossario)
@@ -94,9 +89,9 @@ Para escolher opções, deverá inserir logo após a seta o número corresponden
 
 Esta ação aplica-se a todos os menus do programa.
 
-* Se pertender [Humano contra Computador](#mc-resolve-jogo), pressione a tecla numérica **1**.
+* Se pertender [Humano contra Computador](#mc-humano-contra-computador), pressione a tecla numérica **1**.
 
-* Se pertender [Computador contra Computador](#mc-ver-regras) do jogo, pressione a tecla numérica **2**. 
+* Se pertender [Computador contra Computador](#mc-computador-contra-computador) do jogo, pressione a tecla numérica **2**. 
 
 * Para [Sair](#sair-programa) deverá pressionar a tecla numérica **3**.
 
@@ -138,14 +133,311 @@ O listener do LispWorks deverá apresentar o seguinte estado depois de seleciona
           Ã‚Â§______________________________________________________Ã‚Â§
 
 
-          Opcao -> 
+          Opcao -> 1
+---HUM---"
+TABULEIRO
+____________________________________________________________________________________________
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+Coordenadas: 
+(0 0)
+(0 1)
+(0 2)
+(0 3)
+(1 0)
+(1 1)
+(1 2)
+(1 3)
+(2 0)
+(2 1)
+(2 2)
+(2 3)
+(3 0)
+(3 1)
+(3 2)
+(3 3)
+NIL 
+
+Pecas: 
+(BRANCA REDONDA ALTA OCA)
+(PRETA REDONDA ALTA OCA)
+(BRANCA REDONDA BAIXA OCA)
+(PRETA REDONDA BAIXA OCA)
+(BRANCA QUADRADA ALTA OCA)
+(PRETA QUADRADA ALTA OCA)
+(BRANCA QUADRADA BAIXA OCA)
+(PRETA QUADRADA BAIXA OCA)
+(BRANCA REDONDA ALTA CHEIA)
+(PRETA REDONDA ALTA CHEIA)
+(BRANCA REDONDA BAIXA CHEIA)
+(PRETA REDONDA BAIXA CHEIA)
+(BRANCA QUADRADA ALTA CHEIA)
+(PRETA QUADRADA ALTA CHEIA)
+(BRANCA QUADRADA BAIXA CHEIA)
+(PRETA QUADRADA BAIXA CHEIA)
+NIL 
+
+Escreva as coordenadas e o numero da posicao da peca: 
+1
+6
+------ Jogada efetuada por jogador 1
+
+
+
+
+
+
+
+
+
+
+
+
+---COM---(((((PRETA QUADRADA ALTA OCA) 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 3 1 0 NIL)
+
+
+
+
+
+
+
+
+
+
+
+
+---HUM---"
+TABULEIRO
+____________________________________________________________________________________________
+| (PRETA QUADRADA ALTA OCA) | 0 | 0 | (PRETA REDONDA ALTA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+Coordenadas: 
+(0 1)
+(0 2)
+(1 0)
+(1 1)
+(1 2)
+(1 3)
+(2 0)
+(2 1)
+(2 2)
+(2 3)
+(3 0)
+(3 1)
+(3 2)
+(3 3)
+NIL 
+
+Pecas: 
+(BRANCA REDONDA ALTA OCA)
+(BRANCA REDONDA BAIXA OCA)
+(PRETA REDONDA BAIXA OCA)
+(BRANCA QUADRADA ALTA OCA)
+(BRANCA QUADRADA BAIXA OCA)
+(PRETA QUADRADA BAIXA OCA)
+(BRANCA REDONDA ALTA CHEIA)
+(PRETA REDONDA ALTA CHEIA)
+(BRANCA REDONDA BAIXA CHEIA)
+(PRETA REDONDA BAIXA CHEIA)
+(BRANCA QUADRADA ALTA CHEIA)
+(PRETA QUADRADA ALTA CHEIA)
+(BRANCA QUADRADA BAIXA CHEIA)
+(PRETA QUADRADA BAIXA CHEIA)
+NIL 
+
+Escreva as coordenadas e o numero da posicao da peca: 
+8
+9
+------ Jogada efetuada por jogador 1
+
+
+
+
+
+
+
+
+
+
+
+
+---COM---(((((PRETA QUADRADA ALTA OCA) 0 0 (PRETA REDONDA ALTA OCA)) (0 0 0 0) (0 (BRANCA REDONDA BAIXA CHEIA) 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 25 1 0 NIL)
+
+
+
+
+
+
+
+
+
+
+
+
+---HUM---"
+TABULEIRO
+____________________________________________________________________________________________
+| (PRETA QUADRADA ALTA OCA) | (BRANCA REDONDA ALTA OCA) | 0 | (PRETA REDONDA ALTA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | (BRANCA REDONDA BAIXA CHEIA) | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+Coordenadas: 
+(0 2)
+(1 0)
+(1 1)
+(1 2)
+(1 3)
+(2 0)
+(2 2)
+(2 3)
+(3 0)
+(3 1)
+(3 2)
+(3 3)
+NIL 
+
+Pecas: 
+(BRANCA REDONDA BAIXA OCA)
+(PRETA REDONDA BAIXA OCA)
+(BRANCA QUADRADA ALTA OCA)
+(BRANCA QUADRADA BAIXA OCA)
+(PRETA QUADRADA BAIXA OCA)
+(BRANCA REDONDA ALTA CHEIA)
+(PRETA REDONDA ALTA CHEIA)
+(PRETA REDONDA BAIXA CHEIA)
+(BRANCA QUADRADA ALTA CHEIA)
+(PRETA QUADRADA ALTA CHEIA)
+(BRANCA QUADRADA BAIXA CHEIA)
+(PRETA QUADRADA BAIXA CHEIA)
+NIL 
+
+Escreva as coordenadas e o numero da posicao da peca: 
+4
+2
+------ Jogada efetuada por jogador 1
+
+
+
+
+
+
+
+
+
+
+
+
+---COM---(NIL 0 1 0 NIL)
+
+
+
+
+
+
+
+
+
+
+
+
+---HUM---"
+TABULEIRO
+____________________________________________________________________________________________
+| (PRETA QUADRADA ALTA OCA) | (BRANCA REDONDA ALTA OCA) | 0 | (PRETA REDONDA ALTA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | (BRANCA REDONDA BAIXA CHEIA) | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+Coordenadas: 
+(0 2)
+(1 0)
+(1 1)
+(1 2)
+(1 3)
+(2 0)
+(2 2)
+(2 3)
+(3 0)
+(3 1)
+(3 2)
+(3 3)
+NIL 
+
+Pecas: 
+(BRANCA REDONDA BAIXA OCA)
+(PRETA REDONDA BAIXA OCA)
+(BRANCA QUADRADA ALTA OCA)
+(BRANCA QUADRADA BAIXA OCA)
+(PRETA QUADRADA BAIXA OCA)
+(BRANCA REDONDA ALTA CHEIA)
+(PRETA REDONDA ALTA CHEIA)
+(PRETA REDONDA BAIXA CHEIA)
+(BRANCA QUADRADA ALTA CHEIA)
+(PRETA QUADRADA ALTA CHEIA)
+(BRANCA QUADRADA BAIXA CHEIA)
+(PRETA QUADRADA BAIXA CHEIA)
+NIL 
+
+Escreva as coordenadas e o numero da posicao da peca: 
+5
+3
+------ Jogada efetuada por jogador 1
+
+
+
+
+
+
+
+
+
+
+
+
+---COM---(((((PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) 0 (PRETA REDONDA ALTA OCA)) (0 0 0 (BRANCA QUADRADA ALTA OCA)) (0 (BRANCA REDONDA BAIXA CHEIA) 0 0) (0 0 0 0)) ((BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 1034 1 0 NIL)
+
+
+
+
+
+
+
+
+
+
+
+
+---HUM---"
+TABULEIRO
+____________________________________________________________________________________________
+| (PRETA QUADRADA ALTA OCA) | (BRANCA REDONDA ALTA OCA) | (PRETA QUADRADA ALTA CHEIA) | (PRETA REDONDA ALTA OCA) |
+| 0 | 0 | 0 | (BRANCA QUADRADA ALTA OCA) |
+| 0 | (BRANCA REDONDA BAIXA CHEIA) | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+O vencedor: -1
+
 ```
 
-O presente menu disponibiliza os problemas que devem de estar no ficheiro ***problemas.dat***, à exceção do **Problema Teste**, que deverá ser colocado no ficheiro de [problemas](#tut-problemas).
+O presente menu representa a escolha de opcao de quem vai jogar primeiro se é o humano ou o compatador.
 
-* Se pertender [voltar ao menu principal](#mc-home-menu), selecione a opção **9**.
-
-* Se pertender [resolver um dos jogos](#mc-problema), selecione um número das opções entre **1** e **7**, com especial atenção para a opção **8**, que só é fazível se for colocado um problema extra no ficheiro [problemas](#tut-problemas).
 
 #### <a name="mc-problema">Computador contra Computador</a>
 Para melhor ilustração, será selecionada a opção **1** do menu, correspondente ao modo computador contra computador.
@@ -286,8 +578,6 @@ Cada problema apenas altera-se perante as jogadas geradas com as peças colocada
 No ficheiro ***log.dat***, apenas necessita de registar todas as jogadas efetuadas pelos jogadores e quais os nós que foram analizados, cortados, expandidos e os cortes alfas e betas.
 
 Como mencionada varias vezes ao longo do manual, o ficheiro ***log.dat*** apenas contém as jogadas efetuadas pelos jogadores.
-
-Para tal apenas necessita de abrir o ficheiro ***problemas.dat*** e colocar um problema, de perferência diferente dos problemas existentes, tendo em conta com o exemplo acima ilistrado e manter a separação de uma linha entre o último problema do ficheiro e o novo problema a inserir.
 
 Se tiver dúvidas veja como os problemas no ficheiro ***log.dat*** se encontram colocados.
 
