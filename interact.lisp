@@ -7,6 +7,7 @@
   (load (caminho "algoritmo.lisp")))
 
 (defun comecar ()
+  (reiniciar)
   (loop
     (progn
       (format t "~%~%~%~%~%~%~%~%~%")
@@ -51,6 +52,7 @@
                 ((eq escolha 2) -1)))))
 
 (defun ler-limite ()
+  (exibir-comeco-tab (tab))
   (progn
     (progn
       (format t "   ~%------ESCREVA O TEMPO LIMITE DO COMPUTADOR (1000 >= TEMPO [ms] >= 5000)------")
@@ -116,9 +118,7 @@
 (defun Imprimir (tab &optional (file-stream t))
   "lista o tabuleiro"
   (not (null (mapcar #'(lambda(l) 
-        (format file-stream "~%~t~t ~a"  l)) (car tab))))
-  (not (null (mapcar #'(lambda(l) 
-        (format file-stream "~%~t~t ~a"  l)) (cdr tab)))))
+        (format file-stream "~%~t~t ~a"  l)) tab))))
  #| (cond 
    ((null tab) (format file-stream ""))
    ((tabuleiro-conteudo tab) (progn (Imprimir (tabuleiro-conteudo (car tab)) t) (format t "~%") (Imprimirard-file (tabuleiro-conteudo (cdr tab)) t)))
@@ -152,5 +152,7 @@
       (terpri)
       (format file "~%~t----:  Tabuleiro Atual:")
       (terpri)
-      (Imprimir tab file))))
+      (Imprimir (tabuleiro tab) file)
+      (terpri)
+      (Imprimir (reserva tab) file))))
 

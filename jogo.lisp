@@ -152,3 +152,7 @@
    (t (extrai-n (1- i) (cdr l)))
    )
   )
+
+(defun tempo-milisegundos(tempo)
+  "gets the time of a made play"
+    (- (get-internal-real-time) tempo))
