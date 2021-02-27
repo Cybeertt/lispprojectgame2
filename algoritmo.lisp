@@ -28,7 +28,7 @@
     ;(cond
     ; ((= 1 (no-profundidade-alphabeta *jogar*))
       (setf *tabuleiro (no-estado *jogar*)) 
-      (escreve-log *tabuleiro j1 (tempo-milisegundos temp) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) *tabuleiro))
+      (escreve-log *tabuleiro j1 (tempo-milisegundos temp) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) (estatistica *tabuleiro j1 (tempo-milisegundos temp) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) *tabuleiro))
      ;(t (no-estado tab)))))
 
  
@@ -69,14 +69,15 @@
   ;(exibir-comeco-tab *tabuleiro)
   (cond
    ((= j1 1)
-    (princ "---HUM---") (exibir-tab *tabuleiro)
+    (princ "---HUM---") (exibir-tab *tabuleiro) ;(estatistica *tabuleiro 0 0 *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
     (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
-           (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro)))))
+           (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro))))
+           (temp (get-internal-real-time)))
            ;(ler (ler-jogada casas pecas)))
             ;(princ (tabuleiro *tabuleiro))
       (cond
        ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
-       ((null (no-solucaop (cria-no-alphabeta *tabuleiro))) (setf *tabuleiro (humano-quatro (ler-jogada casas pecas) j1)) (escreve-log *tabuleiro j1 0 *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+       ((null (no-solucaop (cria-no-alphabeta *tabuleiro))) (setf *tabuleiro (humano-quatro (ler-jogada casas pecas) j1)) (escreve-log *tabuleiro j1  (tempo-milisegundos (get-internal-real-time)) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) (estatistica *tabuleiro j1 (tempo-milisegundos temp) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
         (humcom tempo profundidade (outro-jogador j1)))
        (t (format t "O vencedor: ~a" (outro-jogador j1)) (comecar)))))
    (t (princ "---COM---") 
@@ -178,13 +179,12 @@ para que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
    ((null sucessores) alpha) ; sem sucessores
    (t
     ; algoritmo alphabeta
-    (let* ((value (max alpha (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) tempo alpha beta)))
+    (let* ((value (max alpha (alphabeta sucessor profundidade (outro-jogador jogador) tempo alpha beta)))
            (a (max alpha value)))
       (cond
-       ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) alpha) ; condicao de corte: alpha >= beta
+       ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1)) (setf *nos-cortados* (+ *nos-cortados* 1)) alpha)) ; condicao de corte: alpha >= beta
        (t (cond 
-           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)))
-            (max a (alphabeta-max profundidade jogador (cdr *sc) tempo a beta)))
+           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)) (max a (alphabeta-max profundidade jogador (cdr *sc) tempo a beta))))
            (t (alphabeta-max profundidade jogador (cddddr sucessor) tempo a beta))))))))) ; recursividade
 
 #|3. Alphabeta-min que seria uma funcao auxiliar que iria ser chamada sempre que o jogador e min 
@@ -196,12 +196,12 @@ que essa funcao recursivamente chamasse o Alphabeta para cada sucessor.|#
    ((null sucessores) beta) ; sem sucessores
    (t
     ; algoritmo alphabeta
-    (let* ((value (min beta (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) tempo alpha beta)))
+    (let* ((value (min beta (alphabeta sucessor profundidade (outro-jogador jogador) tempo alpha beta)))
            (b (min beta value)))
       (cond
-       ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) beta) ; condicao de corte: beta <= alpha
+       ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1)) (setf *nos-cortados* (+ *nos-cortados* 1)) beta)) ; condicao de corte: beta <= alpha
        (t (cond 
-           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) (min b (alphabeta-min profundidade jogador (cdr *scm) tempo alpha b)))
+           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)) (min b (alphabeta-min profundidade jogador (cdr sucessores) tempo alpha b))))
            (t (alphabeta-min profundidade jogador (cddddr sucessor) tempo alpha b)))))))))
 
 #|END Alphabeta functions|#
@@ -287,6 +287,7 @@ ordem - Ordenacao 'min ou 'max
       (cond
        ((eq ordem 'min) (sort nos #'< :key #'no-value))
        (t (sort nos #'> :key #'no-value)))))))
+)
 
 #|
 TIME
@@ -338,67 +339,5 @@ Elapsed time =        0.005
 Allocation   = 4327152 bytes  136206264 bytes
 0 Page faults
 Calls to %EVAL    41749
-
-|#
-
-
-#|TEMPORARIO|#
-
-;; tabuleiro com pontuacao
-(defun pontuacao ()
-  '((1000 2000 3000 4000) (5000 6000 7000 8000) (9000 10000 11000 12000) (13000 14000 15000 16000)))
-
-;; pontuacao, remover da coordenada o valor
-(defun casas-n-vazias (tab profundidade j1 &optional (l 0))
-  (labels (( coordenadas (fila l &optional (c 0))
-             (cond
-              ((null fila) nil)
-              ((listp (car fila)) ; zerop
-               (cons (list l c) (coordenadas (cdr fila) l (1+ c))))
-              (t (coordenadas (cdr fila) l (1+ c))))))
-             (cond 
-              ((not (null (gethash (list tab j1) *dispersao*))) 
-               (cria-no-alphabeta (gethash (list tab j1) *dispersao*) (1+ profundidade) j1 nil))
-              (t (append (coordenadas (car tab) l) 
-                         (casas-n-vazias (cdr tab) profundidade (1+ l)))))))
-
-(defun nova-pontuacao (tabuleiro profundidade j1)
-  (let ((tabuleiro-pontuacao (copy-tree (pontuacao))) (ocupadas (casas-n-vazias tabuleiro profundidade j1)))
-    (cond
-     ((null ocupadas) 0)
-     (t (mapcar #'(lambda (x) (substituir-posicao (cadr x) 0 (fila (car x) tabuleiro-pontuacao))) ocupadas)
-        tabuleiro-pontuacao))))
-      ;(substituir-posicao c p (fila l (tabuleiro novo-tabuleiro)))
-      ;(substituir-posicao (cadr x) 0 (fila (car x) tabuleiro-pontuacao))
-;; calculo de pontuacao
-;; p: (pontuacao)
-(defun limit-max-pontuacao (pontuacao)
-  (apply #'+ (mapcar #'(lambda (x) (apply #'+ x)) (mapcar #'(lambda (lista) lista) pontuacao))))
-
-
-;; tabuleiro teste
-(defun p ()
-'(((((BRANCA QUADRADA BAIXA CHEIA) 0 (PRETA REDONDA ALTA CHEIA) (PRETA QUADRADA BAIXA OCA)) (0 0 0 (BRANCA REDONDA BAIXA OCA)) ((BRANCA REDONDA ALTA CHEIA) 0 (PRETA REDONDA ALTA OCA) 0) (0 (PRETA QUADRADA BAIXA CHEIA) 0 0)) ((BRANCA QUADRADA ALTA CHEIA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA OCA))) 44 1 0 NIL))
-
-) ; let
-
-#|
-(avaliar-no (cria-no-alphabeta (tab)) 1)
-0
-
-(sumalpha (cria-no-alphabeta (tab)) 1)
--136000
-
-(subtractbeta (cria-no-alphabeta (tab)) 1)
-136000
-
-(limit-max-pontuacao (pontuacao))
-136000
-
-(casas-n-vazias (tabuleiro (no-estado (p))))
-((0 0) (0 2) (0 3) (1 3) (2 0) (2 2) (3 1))
-
-(limit-max-pontuacao (nova-pontuacao (tabuleiro (no-estado (p)))))
-86000
 
 |#

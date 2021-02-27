@@ -126,8 +126,6 @@
 
 
 (defun escreve-log (tab j tempo alfa beta nos-analisados nos-expandidos nos-cortados)
-  "Writes the statistics file with the solution and it's statistic data, for breadth first and depth first algorithms"
-
  
   (with-open-file (file (caminho "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
     (progn 
@@ -155,4 +153,30 @@
       (Imprimir (tabuleiro tab) file)
       (terpri)
       (Imprimir (reserva tab) file))))
+
+(defun estatistica (tab j tempo alfa beta nos-analisados nos-expandidos nos-cortados)
+    (progn 
+      (terpri)
+      (terpri)
+      (format t "~%~t------------:JOGADA------------")
+      (terpri)
+      (format t "~%~t----:  Tempo do jogo: ~a Milisegundos" tempo)  
+      (terpri)
+      (format t "~%~t----:  Jogador: ~a " j)  
+      (terpri)
+      (format t "~%~t----:  Cortes Alfa: ~a" alfa)
+      (terpri)
+      (format t "~%~t----:  Cortes Beta: ~a" beta)
+      (terpri)
+      (format t "~%~t----:  Nos Analisados: ~a" nos-analisados)
+      (terpri)
+      (format t "~%~t----:  Nos Expandidos: ~a" nos-expandidos)
+      (terpri)
+      (format t "~%~t----:  Nos Cortados: ~a" nos-cortados)
+      (terpri)
+      (terpri)
+      (format t "~%~t----:  Tabuleiro Atual:")
+      (terpri)
+      (exibir-tab tab)
+      (terpri)))
 

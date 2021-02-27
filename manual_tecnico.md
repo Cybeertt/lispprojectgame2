@@ -62,15 +62,16 @@ Neste manual encontram-se explicações sobre o jogo, como o iniciar, a estrutur
     * [Print-Hash-Entry](#f-print-hash-entry)
   * [Interact](#f-interact)
     * [Base-Pathname](#proj-constante-base-pathname)
-    * [Asset-Path](#f-proj-asset-path)
+    * [Caminho](#f-proj-caminho)
     * [Load Files](#proj-load-files)
-    * [Menu-Principal](#f-proj-menu-principal)
+    * [Comecar](#f-proj-comecar)
     * [Primeiro-Jogar](proj-primeiro-jogar)
-    * [Escrever-Logo](#f-proj-escrever-logo)
     * [Ler-Limite](#f-ler-limite)
     * [Exibir-Tab](#f-exibir-tab)
     * [Exibir-Comeco-Tab](#f-exibir-comeco-tab)
     * [Imprimir](#f-imprimir)
+    * [Escreve-Log](#f-escreve-log)
+    * [Estatistica](#f-estatistica)
 * [Conslusão](#conclusao)
 
 ## <a name="doc-abstract">**Abstrato**</a>
@@ -740,27 +741,27 @@ Reinicia um jogo no modo Humano versus PC, admitindo um determinado limite tempo
 ```lisp
 ; funcao
 (defun humcom (tempo profundidade &optional (j1 1))
-  (reiniciar)
-  (setf *jogador j1)
-  (escreve-log *tabuleiro 0 (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
-  (loop while (not (null (quatro-linha-p *tabuleiro))) ;(not (null (reserva *tabuleiro))))
-        do
-        (cond
-         ((no-solucaop (cria-no-alphabeta *tabuleiro)) (startup))
-         ((= *jogador 1)
-          (exibir-tab *tabuleiro)
-(princ "---HUM---")
-          (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
-                 (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro)) 0))
-                 (ler (ler-jogada casas pecas)))
-            (cond
-             ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
-             
-             (t (setf *tabuleiro (humano-quatro ler)) (escreve-log *tabuleiro *jogador (get-internal-real-time) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
-                (terpri) (exibir-tab *tabuleiro)))
-            ) )
-         (t (princ "---COM---") (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo profundidade))))
-        (setf *jogador (outro-jogador *jogador))) (exibir-tab *tabuleiro) (startup))
+  ;(setf *jogador j1)
+  (setf *p profundidade)
+  ;(princ *p)
+  ;(exibir-comeco-tab *tabuleiro)
+  (cond
+   ((= j1 1)
+    (princ "---HUM---") (exibir-tab *tabuleiro) ;(estatistica *tabuleiro 0 0 *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+    (let* ((pecas (reserva (no-estado (cria-no-alphabeta *tabuleiro))))
+           (casas (casas-vazias (tabuleiro-conteudo (cria-no-alphabeta *tabuleiro))))
+           (temp (get-internal-real-time)))
+           ;(ler (ler-jogada casas pecas)))
+            ;(princ (tabuleiro *tabuleiro))
+      (cond
+       ((and (null pecas) (null casas)) (exibir-tab *tabuleiro))
+       ((null (no-solucaop (cria-no-alphabeta *tabuleiro))) (setf *tabuleiro (humano-quatro (ler-jogada casas pecas) j1)) (escreve-log *tabuleiro j1  (tempo-milisegundos (get-internal-real-time)) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*) (estatistica *tabuleiro j1 (tempo-milisegundos temp) *cortes-alfa* *cortes-beta* *nos-analisados* *nos-expandidos* *nos-cortados*)
+        (humcom tempo profundidade (outro-jogador j1)))
+       (t (format t "O vencedor: ~a" (outro-jogador j1)) (comecar)))))
+   (t (princ "---COM---") 
+      (cond
+       ((null (no-solucaop (cria-no-alphabeta *tabuleiro))) (setf *tabuleiro (jogar-quatro (cria-no-alphabeta *tabuleiro) tempo j1)) (humcom tempo profundidade (outro-jogador j1)))
+       (t (format t "O vencedor: ~a" (outro-jogador j1)) (comecar))))))
 ```
 
 #### <a nome="f-jogada">Jogada</a>
@@ -1558,12 +1559,13 @@ Função auxiliar recursiva que prócura o valor máximo heuristico dos sucessor
    ((null sucessores) alpha) ; sem sucessores
    (t
     ; algoritmo alphabeta
-    (let* ((value (max alpha (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) tempo alpha beta)))
+    (let* ((value (max alpha (alphabeta sucessor profundidade (outro-jogador jogador) tempo alpha beta)))
            (a (max alpha value)))
       (cond
-       ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) alpha) ; condicao de corte: alpha >= beta
-       (t (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) 
-          (max a (alphabeta-max profundidade jogador (cdr sucessores) tempo a beta))))))))
+       ((>= a beta) (progn (setf *cortes-alfa* (+ *cortes-alfa* 1)) (setf *nos-cortados* (+ *nos-cortados* 1)) alpha)) ; condicao de corte: alpha >= beta
+       (t (cond 
+           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)) (max a (alphabeta-max profundidade jogador (cdr *sc) tempo a beta))))
+           (t (alphabeta-max profundidade jogador (cddddr sucessor) tempo a beta)))))))))
 ```
 
 #### <a nome="f-alphabeta-min">Alphabeta-Min</a>
@@ -1586,12 +1588,13 @@ Função auxiliar recursiva que prócura o valor minimo heuristico dos sucessore
    ((null sucessores) beta) ; sem sucessores
    (t
     ; algoritmo alphabeta
-    (let* ((value (min beta (alphabeta sucessor (- profundidade 1) (outro-jogador jogador) tempo alpha beta)))
+    (let* ((value (min beta (alphabeta sucessor profundidade (outro-jogador jogador) tempo alpha beta)))
            (b (min beta value)))
       (cond
-       ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1)) (setf *nos-cortados* (+ *nos-cortados* 1))) beta) ; condicao de corte: beta <= alpha
-       (t (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1))) 
-          (min b (alphabeta-min profundidade jogador (cdr sucessores) tempo alpha b))))))))
+       ((<= b alpha) (progn (setf *cortes-beta* (+ *cortes-beta* 1)) (setf *nos-cortados* (+ *nos-cortados* 1)) beta)) ; condicao de corte: beta <= alpha
+       (t (cond 
+           ((= 1 (no-profundidade-alphabeta sucessor)) (progn (setf *jogar* sucessor) (setf *nos-analisados* (+ *nos-analisados* 1)) (min b (alphabeta-min profundidade jogador (cdr sucessores) tempo alpha b))))
+           (t (alphabeta-min profundidade jogador (cddddr sucessor) tempo alpha b)))))))))
 ```
 
 #### <a nome="f-print-hash-entry">Print-Hash-Entry</a>
@@ -1619,7 +1622,7 @@ Esta constante permite encontrar um ficheiro independentemente do tipo de sistem
 (defvar *base-pathname* (or *load-truename* *compile-file-truename*))
 ```
 
-#### <a name="f-proj-asset-path">Caminho</a>
+#### <a name="f-proj-caminho">Caminho</a>
 Determina o caminho de um ficheiro independentemente de um sistema operativo.
 
 **Parâmetros**
@@ -1642,7 +1645,7 @@ Carrega ficheiros necessários para o funcionamento do programa.
   (load (caminho "algoritmo.lisp")))
 ```
 
-#### <a name="f-proj-menu-principal">Menu-Principal</a>
+#### <a name="f-proj-comecar">Comecar</a>
 Imprime na consola um menu de escolhas: Humano contra Computador, Computador contra Computador, Sair.
 
 Cada escolha encontra-se associada a uma valor numérico que permite executar a ação escolhida. Caso selecionar uma opção inválida, será pedido novamente para inserir uma opção das disponíveis.
@@ -1660,7 +1663,7 @@ Cada escolha encontra-se associada a uma valor numérico que permite executar a 
 
 ```lisp
 ; funcao
-(defun menu-principal ()
+(defun comecar ()
   (loop
     (progn
       (format t "~%~%~%~%~%~%~%~%~%")
@@ -1718,35 +1721,6 @@ Imprime na consola um tabuleiro correspondente ao jogo e questiona qual o primei
                (cond 
                 ((eq escolha 1) 1)
                 ((eq escolha 2) -1)))))
-```
-
-#### <a name="f-proj-escreve-log">Escreve-Logo</a>
-Escreve num ficheiro a jogada efetuada com o estado do tabuleiro e o seu tempo de execução.
-
-**Parâmetros**
-
-*tab - Tabela atual*
-
-*tempo - tempo atual de jogo*
-
-```lisp
-; funcao
-(defun escreve-log (tab tempo)
-  "Writes the statistics file with the solution and it's statistic data, for breadth first and depth first algorithms"
-
- 
-         (with-open-file (file (asset-path "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
-           (progn 
-             (terpri)
-                (format file "~%~t------------:JOGADA------------")
-             (terpri)
-                (format file "~%~t----:  Tempo do jogo: ~a Milisegundos" tempo)  
-             (terpri)
-             (terpri)
-                (format file "~%~t----:  Tabuleiro Atual:")
-             (terpri)
-                (Imprimir tab file)
-             )))
 ```
 
 #### <a name="f-ler-limite">Ler-Limite</a>
@@ -1844,6 +1818,111 @@ Imprime na consola o tabuleiro inicial, a ser utilizada antes de cada jogo.
 (format t "-----------------TABULEIRO INICIAL-----------------")
 (terpri)
 (terpri))
+```
+
+#### <a name="f-escreve-log">Escreve-Log</a>
+Faz a escrita num ficheiro a estatistica de cada jogada.
+
+**Parâmetros**
+
+*tab - Tabuleiro*
+
+*j - Jogador*
+
+*tempo*
+
+*alfa*
+
+*beta*
+
+*nos-analisados*
+
+*nos-expandidos* 
+
+*nos-cortados*
+
+```lisp
+; funcao
+(defun escreve-log (tab j tempo alfa beta nos-analisados nos-expandidos nos-cortados)
+ 
+  (with-open-file (file (caminho "log.dat") :direction :output :if-exists :append :if-does-not-exist :create)
+    (progn 
+      (terpri)
+      (terpri)
+      (format file "~%~t------------:JOGADA------------")
+      (terpri)
+      (format file "~%~t----:  Tempo do jogo: ~a Milisegundos" tempo)  
+      (terpri)
+      (format file "~%~t----:  Jogador: ~a " j)  
+      (terpri)
+      (format file "~%~t----:  Cortes Alfa: ~a" alfa)
+      (terpri)
+      (format file "~%~t----:  Cortes Beta: ~a" beta)
+      (terpri)
+      (format file "~%~t----:  Nos Analisados: ~a" nos-analisados)
+      (terpri)
+      (format file "~%~t----:  Nos Expandidos: ~a" nos-expandidos)
+      (terpri)
+      (format file "~%~t----:  Nos Cortados: ~a" nos-cortados)
+      (terpri)
+      (terpri)
+      (format file "~%~t----:  Tabuleiro Atual:")
+      (terpri)
+      (Imprimir (tabuleiro tab) file)
+      (terpri)
+      (Imprimir (reserva tab) file))))
+```
+
+#### <a name="f-estatistica">Estatistica</a>
+Escreve na consola a estatistica de cada jogada.
+
+**Parâmetros**
+
+*tab - Tabuleiro*
+
+*j - Jogador*
+
+*tempo*
+
+*alfa*
+
+*beta*
+
+*nos-analisados*
+
+*nos-expandidos* 
+
+*nos-cortados*
+
+```lisp
+
+(defun estatistica (tab j tempo alfa beta nos-analisados nos-expandidos nos-cortados)
+    (progn 
+      (terpri)
+      (terpri)
+      (format t "~%~t------------:JOGADA------------")
+      (terpri)
+      (format t "~%~t----:  Tempo do jogo: ~a Milisegundos" tempo)  
+      (terpri)
+      (format t "~%~t----:  Jogador: ~a " j)  
+      (terpri)
+      (format t "~%~t----:  Cortes Alfa: ~a" alfa)
+      (terpri)
+      (format t "~%~t----:  Cortes Beta: ~a" beta)
+      (terpri)
+      (format t "~%~t----:  Nos Analisados: ~a" nos-analisados)
+      (terpri)
+      (format t "~%~t----:  Nos Expandidos: ~a" nos-expandidos)
+      (terpri)
+      (format t "~%~t----:  Nos Cortados: ~a" nos-cortados)
+      (terpri)
+      (terpri)
+      (format t "~%~t----:  Tabuleiro Atual:")
+      (terpri)
+      (exibir-tab tab)
+      (terpri)))
+
+
 ```
 
 #### <a name="f-imprimir">Imprimir</a>

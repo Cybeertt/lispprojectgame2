@@ -99,7 +99,7 @@ Esta ação aplica-se a todos os menus do programa.
 O listener do LispWorks deverá apresentar o seguinte estado depois de selecionar a opção **1** do menu principal.
 
 ```lisp
-             _______________________________________________________
+                     _______________________________________________________
           Ã‚Â§                  JOGO DO PROBlEMA DO 4               Ã‚Â§
           Ã‚Â§                                                      Ã‚Â§
           Ã‚Â§                                                      Ã‚Â§
@@ -111,9 +111,29 @@ O listener do LispWorks deverá apresentar o seguinte estado depois de seleciona
 
 
           Opcao -> 1
+
+
+-----------------TABULEIRO INICIAL-----------------
+
+"
+TABULEIRO
+____________________________________________________________________________________________
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+
+-----------------TABULEIRO INICIAL-----------------
+
    
 ------ESCREVA O TEMPO LIMITE DO COMPUTADOR (1000 >= TEMPO [ms] >= 5000)------
-1000
+5000
+   
+------ESCREVA A PROFUNDIDADE MAXIMA------
+10
 
 
 
@@ -184,7 +204,7 @@ NIL
 
 Escreva as coordenadas e o numero da posicao da peca: 
 1
-6
+1
 ------ Jogada efetuada por jogador 1
 
 
@@ -198,7 +218,39 @@ Escreva as coordenadas e o numero da posicao da peca:
 
 
 
----COM---(((((PRETA QUADRADA ALTA OCA) 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 3 1 0 NIL)
+
+
+
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 1471 Milisegundos
+
+ ----:  Jogador: 1 
+
+ ----:  Cortes Alfa: 0
+
+ ----:  Cortes Beta: 0
+
+ ----:  Nos Analisados: 0
+
+ ----:  Nos Expandidos: 0
+
+ ----:  Nos Cortados: 0
+
+
+ ----:  Tabuleiro Atual:
+"
+TABULEIRO
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+
+---COM---(((((BRANCA REDONDA ALTA OCA) 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 3 1 0 NIL)
 
 
 
@@ -210,11 +262,43 @@ Escreva as coordenadas e o numero da posicao da peca:
 
 
 
+
+
+
+
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 1763 Milisegundos
+
+ ----:  Jogador: -1 
+
+ ----:  Cortes Alfa: 9
+
+ ----:  Cortes Beta: 9
+
+ ----:  Nos Analisados: 3
+
+ ----:  Nos Expandidos: 2890
+
+ ----:  Nos Cortados: 18
+
+
+ ----:  Tabuleiro Atual:
+"
+TABULEIRO
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | 0 | 0 | (BRANCA REDONDA BAIXA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
 
 ---HUM---"
 TABULEIRO
 ____________________________________________________________________________________________
-| (PRETA QUADRADA ALTA OCA) | 0 | 0 | (PRETA REDONDA ALTA OCA) |
+| (BRANCA REDONDA ALTA OCA) | 0 | 0 | (BRANCA REDONDA BAIXA OCA) |
 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
@@ -239,10 +323,10 @@ Coordenadas:
 NIL 
 
 Pecas: 
-(BRANCA REDONDA ALTA OCA)
-(BRANCA REDONDA BAIXA OCA)
+(PRETA REDONDA ALTA OCA)
 (PRETA REDONDA BAIXA OCA)
 (BRANCA QUADRADA ALTA OCA)
+(PRETA QUADRADA ALTA OCA)
 (BRANCA QUADRADA BAIXA OCA)
 (PRETA QUADRADA BAIXA OCA)
 (BRANCA REDONDA ALTA CHEIA)
@@ -256,76 +340,7 @@ Pecas:
 NIL 
 
 Escreva as coordenadas e o numero da posicao da peca: 
-8
-9
------- Jogada efetuada por jogador 1
-
-
-
-
-
-
-
-
-
-
-
-
----COM---(((((PRETA QUADRADA ALTA OCA) 0 0 (PRETA REDONDA ALTA OCA)) (0 0 0 0) (0 (BRANCA REDONDA BAIXA CHEIA) 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 25 1 0 NIL)
-
-
-
-
-
-
-
-
-
-
-
-
----HUM---"
-TABULEIRO
-____________________________________________________________________________________________
-| (PRETA QUADRADA ALTA OCA) | (BRANCA REDONDA ALTA OCA) | 0 | (PRETA REDONDA ALTA OCA) |
-| 0 | 0 | 0 | 0 |
-| 0 | (BRANCA REDONDA BAIXA CHEIA) | 0 | 0 |
-| 0 | 0 | 0 | 0 |
-____________________________________________________________________________________________
-
-"
-Coordenadas: 
-(0 2)
-(1 0)
-(1 1)
-(1 2)
-(1 3)
-(2 0)
-(2 2)
-(2 3)
-(3 0)
-(3 1)
-(3 2)
-(3 3)
-NIL 
-
-Pecas: 
-(BRANCA REDONDA BAIXA OCA)
-(PRETA REDONDA BAIXA OCA)
-(BRANCA QUADRADA ALTA OCA)
-(BRANCA QUADRADA BAIXA OCA)
-(PRETA QUADRADA BAIXA OCA)
-(BRANCA REDONDA ALTA CHEIA)
-(PRETA REDONDA ALTA CHEIA)
-(PRETA REDONDA BAIXA CHEIA)
-(BRANCA QUADRADA ALTA CHEIA)
-(PRETA QUADRADA ALTA CHEIA)
-(BRANCA QUADRADA BAIXA CHEIA)
-(PRETA QUADRADA BAIXA CHEIA)
-NIL 
-
-Escreva as coordenadas e o numero da posicao da peca: 
-4
+2
 2
 ------ Jogada efetuada por jogador 1
 
@@ -340,63 +355,39 @@ Escreva as coordenadas e o numero da posicao da peca:
 
 
 
----COM---(NIL 0 1 0 NIL)
 
 
 
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 5606 Milisegundos
+
+ ----:  Jogador: 1 
+
+ ----:  Cortes Alfa: 0
+
+ ----:  Cortes Beta: 0
+
+ ----:  Nos Analisados: 0
+
+ ----:  Nos Expandidos: 2890
+
+ ----:  Nos Cortados: 18
 
 
-
-
-
-
-
-
-
----HUM---"
+ ----:  Tabuleiro Atual:
+"
 TABULEIRO
 ____________________________________________________________________________________________
-| (PRETA QUADRADA ALTA OCA) | (BRANCA REDONDA ALTA OCA) | 0 | (PRETA REDONDA ALTA OCA) |
+| (BRANCA REDONDA ALTA OCA) | 0 | (PRETA REDONDA BAIXA OCA) | (BRANCA REDONDA BAIXA OCA) |
 | 0 | 0 | 0 | 0 |
-| 0 | (BRANCA REDONDA BAIXA CHEIA) | 0 | 0 |
+| 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
 ____________________________________________________________________________________________
 
 "
-Coordenadas: 
-(0 2)
-(1 0)
-(1 1)
-(1 2)
-(1 3)
-(2 0)
-(2 2)
-(2 3)
-(3 0)
-(3 1)
-(3 2)
-(3 3)
-NIL 
 
-Pecas: 
-(BRANCA REDONDA BAIXA OCA)
-(PRETA REDONDA BAIXA OCA)
-(BRANCA QUADRADA ALTA OCA)
-(BRANCA QUADRADA BAIXA OCA)
-(PRETA QUADRADA BAIXA OCA)
-(BRANCA REDONDA ALTA CHEIA)
-(PRETA REDONDA ALTA CHEIA)
-(PRETA REDONDA BAIXA CHEIA)
-(BRANCA QUADRADA ALTA CHEIA)
-(PRETA QUADRADA ALTA CHEIA)
-(BRANCA QUADRADA BAIXA CHEIA)
-(PRETA QUADRADA BAIXA CHEIA)
-NIL 
-
-Escreva as coordenadas e o numero da posicao da peca: 
-5
-3
------- Jogada efetuada por jogador 1
+---COM---(((((BRANCA REDONDA ALTA OCA) 0 (PRETA REDONDA BAIXA OCA) (BRANCA REDONDA BAIXA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA ALTA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 1005 1 0 NIL)
 
 
 
@@ -409,25 +400,44 @@ Escreva as coordenadas e o numero da posicao da peca:
 
 
 
----COM---(((((PRETA QUADRADA ALTA OCA) (BRANCA REDONDA ALTA OCA) 0 (PRETA REDONDA ALTA OCA)) (0 0 0 (BRANCA QUADRADA ALTA OCA)) (0 (BRANCA REDONDA BAIXA CHEIA) 0 0) (0 0 0 0)) ((BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 1034 1 0 NIL)
 
 
 
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 144 Milisegundos
+
+ ----:  Jogador: -1 
+
+ ----:  Cortes Alfa: 1
+
+ ----:  Cortes Beta: 1
+
+ ----:  Nos Analisados: 9
+
+ ----:  Nos Expandidos: 3141
+
+ ----:  Nos Cortados: 20
 
 
+ ----:  Tabuleiro Atual:
+"
+TABULEIRO
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | (PRETA REDONDA BAIXA CHEIA) | (PRETA REDONDA BAIXA OCA) | (BRANCA REDONDA BAIXA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
 
-
-
-
-
-
+"
 
 ---HUM---"
 TABULEIRO
 ____________________________________________________________________________________________
-| (PRETA QUADRADA ALTA OCA) | (BRANCA REDONDA ALTA OCA) | (PRETA QUADRADA ALTA CHEIA) | (PRETA REDONDA ALTA OCA) |
-| 0 | 0 | 0 | (BRANCA QUADRADA ALTA OCA) |
-| 0 | (BRANCA REDONDA BAIXA CHEIA) | 0 | 0 |
+| (BRANCA REDONDA ALTA OCA) | (PRETA REDONDA BAIXA CHEIA) | (PRETA REDONDA BAIXA OCA) | (BRANCA REDONDA BAIXA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
 ____________________________________________________________________________________________
 
@@ -445,7 +455,7 @@ Para melhor ilustração, será selecionada a opção **1** do menu, corresponde
 O listener deverá apresentar o seguinte estado:
 
 ```lisp
-                  _______________________________________________________
+                     _______________________________________________________
           Ã‚Â§                  JOGO DO PROBlEMA DO 4               Ã‚Â§
           Ã‚Â§                                                      Ã‚Â§
           Ã‚Â§                                                      Ã‚Â§
@@ -457,23 +467,75 @@ O listener deverá apresentar o seguinte estado:
 
 
           Opcao -> 2
+
+
+-----------------TABULEIRO INICIAL-----------------
+
+"
+TABULEIRO
+____________________________________________________________________________________________
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+
+-----------------TABULEIRO INICIAL-----------------
+
    
 ------ESCREVA O TEMPO LIMITE DO COMPUTADOR (1000 >= TEMPO [ms] >= 5000)------
 5000
    
 ------ESCREVA A PROFUNDIDADE MAXIMA------
-4
+10
+((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 1 0 NIL)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 3348 Milisegundos
+
+ ----:  Jogador: 1 
+
+ ----:  Cortes Alfa: 8
+
+ ----:  Cortes Beta: 9
+
+ ----:  Nos Analisados: 1
+
+ ----:  Nos Expandidos: 2985
+
+ ----:  Nos Cortados: 17
+
+
+ ----:  Tabuleiro Atual:
 "
 TABULEIRO
-_________________________________________________________________________________________________________________________
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
-| 0 | 0 | 0 | 0 |
-_________________________________________________________________________________________________________________________
+____________________________________________________________________________________________
 
 "
-jogar-quatro(((((BRANCA REDONDA ALTA OCA) 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 3 1 1 ((((0 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 0 1 0 NIL))
+
+(((((BRANCA REDONDA ALTA OCA) 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 3 1 0 NIL)
 
 
 
@@ -485,53 +547,40 @@ jogar-quatro(((((BRANCA REDONDA ALTA OCA) 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) 
 
 
 
-jogar-quatro(((((BRANCA REDONDA ALTA OCA) 0 0 (PRETA REDONDA ALTA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) -14 -1 1 (((((BRANCA REDONDA ALTA OCA) 0 0 0) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) -3 -1 0 NIL))
 
 
 
 
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 1993 Milisegundos
+
+ ----:  Jogador: -1 
+
+ ----:  Cortes Alfa: 9
+
+ ----:  Cortes Beta: 9
+
+ ----:  Nos Analisados: 3
+
+ ----:  Nos Expandidos: 5875
+
+ ----:  Nos Cortados: 35
 
 
-
-
-
-
-
-jogar-quatro(((((BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) 0 (PRETA REDONDA ALTA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 1005 1 1 (((((BRANCA REDONDA ALTA OCA) 0 0 (PRETA REDONDA ALTA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 14 1 0 NIL))
-
-
-
-
-
-
-
-
-
-
-
-jogar-quatro(((((BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) (PRETA REDONDA BAIXA CHEIA) (PRETA REDONDA ALTA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) -10006 -1 1 (((((BRANCA REDONDA ALTA OCA) (BRANCA REDONDA BAIXA OCA) 0 (PRETA REDONDA ALTA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) -1005 -1 0 NIL))
-
-
-
-
-
-
-
-
-
-
-
+ ----:  Tabuleiro Atual:
 "
 TABULEIRO
-_________________________________________________________________________________________________________________________
-| (BRANCA REDONDA ALTA OCA) | (BRANCA REDONDA BAIXA OCA) | (PRETA REDONDA BAIXA CHEIA) | (PRETA REDONDA ALTA OCA) |
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | 0 | 0 | (BRANCA REDONDA BAIXA OCA) |
 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 0 |
-_________________________________________________________________________________________________________________________
+____________________________________________________________________________________________
 
 "
 
+(((((BRANCA REDONDA ALTA OCA) 0 0 (BRANCA REDONDA BAIXA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA ALTA OCA) (PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 14 1 0 NIL)
 
 
 
@@ -540,6 +589,97 @@ ________________________________________________________________________________
 
 
 
+
+
+
+
+
+
+
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 328 Milisegundos
+
+ ----:  Jogador: 1 
+
+ ----:  Cortes Alfa: 2
+
+ ----:  Cortes Beta: 2
+
+ ----:  Nos Analisados: 1
+
+ ----:  Nos Expandidos: 6486
+
+ ----:  Nos Cortados: 39
+
+
+ ----:  Tabuleiro Atual:
+"
+TABULEIRO
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | (PRETA REDONDA ALTA OCA) | 0 | (BRANCA REDONDA BAIXA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+
+(((((BRANCA REDONDA ALTA OCA) (PRETA REDONDA ALTA OCA) 0 (BRANCA REDONDA BAIXA OCA)) (0 0 0 0) (0 0 0 0) (0 0 0 0)) ((PRETA REDONDA BAIXA OCA) (BRANCA QUADRADA ALTA OCA) (PRETA QUADRADA ALTA OCA) (BRANCA QUADRADA BAIXA OCA) (PRETA QUADRADA BAIXA OCA) (BRANCA REDONDA ALTA CHEIA) (PRETA REDONDA ALTA CHEIA) (BRANCA REDONDA BAIXA CHEIA) (PRETA REDONDA BAIXA CHEIA) (BRANCA QUADRADA ALTA CHEIA) (PRETA QUADRADA ALTA CHEIA) (BRANCA QUADRADA BAIXA CHEIA) (PRETA QUADRADA BAIXA CHEIA))) 1005 1 0 NIL)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ ------------:JOGADA------------
+
+ ----:  Tempo do jogo: 182 Milisegundos
+
+ ----:  Jogador: -1 
+
+ ----:  Cortes Alfa: 1
+
+ ----:  Cortes Beta: 1
+
+ ----:  Nos Analisados: 9
+
+ ----:  Nos Expandidos: 6749
+
+ ----:  Nos Cortados: 41
+
+
+ ----:  Tabuleiro Atual:
+"
+TABULEIRO
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | (PRETA REDONDA ALTA OCA) | (PRETA REDONDA BAIXA CHEIA) | (BRANCA REDONDA BAIXA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
+
+O vencedor: -1"
+TABULEIRO
+____________________________________________________________________________________________
+| (BRANCA REDONDA ALTA OCA) | (PRETA REDONDA ALTA OCA) | (PRETA REDONDA BAIXA CHEIA) | (BRANCA REDONDA BAIXA OCA) |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 0 |
+____________________________________________________________________________________________
+
+"
 
              _______________________________________________________
           Ã‚Â§                  JOGO DO PROBlEMA DO 4               Ã‚Â§
